@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserService {
-
+public class UserService implements Service<User, UUID> {
     private static UserService INSTANCE;
 
     private UserService() {
@@ -19,17 +18,20 @@ public class UserService {
         return UserRepository.getInstance().findAll();
     }
 
-    public Optional<User> getById(UUID uuid) {
-        return UserRepository.getInstance().findById(uuid);
+    @Override
+    public User getById(UUID uuid) {
+        Optional<User> optional = UserRepository.getInstance().findById(uuid);
+        return optional.orElse(null);
     }
 
-    public Optional<User> getByUsername(String username) {
-        return UserRepository.getInstance().findByUsername(username);
+    public User getByUsername(String username) {
+        Optional<User> optional = UserRepository.getInstance().findByUsername(username);
+        return optional.orElse(null);
     }
 
-    public User createUser(User user) {
-        Optional<User> optional = getByUsername(user.getUsername());
-        if (optional.isPresent()) {
+    @Override
+    public User create(User user) {
+        if (getByUsername(user.getUsername()) == null) {
             return null;
         }
 

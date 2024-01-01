@@ -1,6 +1,6 @@
 package at.if22b208.mtc.controller;
 
-import at.if22b208.mtc.dto.user.UserDto;
+import at.if22b208.mtc.dto.UserDto;
 import at.if22b208.mtc.entity.User;
 import at.if22b208.mtc.exception.HashingException;
 import at.if22b208.mtc.server.Controller;
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 public class SessionController implements Controller {
@@ -33,10 +32,8 @@ public class SessionController implements Controller {
             String hash = HashingUtils.hash(dto.getPassword(), HashingUtils.generateSalt(dto.getUsername()));
 
             // Retrieve the user by username
-            Optional<User> optional = UserService.getInstance().getByUsername(dto.getUsername());
-            if (optional.isPresent()) {
-                User user = optional.get();
-
+            User user = UserService.getInstance().getByUsername(dto.getUsername());
+            if (user != null) {
                 // Check if the user exists and if the provided username and password match
                 if (Objects.equals(user.getUsername(), dto.getUsername()) && Objects.equals(user.getPassword(), hash)) {
                     // Successful login
@@ -49,13 +46,6 @@ public class SessionController implements Controller {
         // Unsuccessful login
         // Not exposing information about already existing accounts or whether username or password is not matching
         return new Response(HttpStatus.FORBIDDEN, ContentType.PLAIN_TEXT, "Invalid username or password.");
-    }
-
-    public static synchronized SessionController getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new SessionController();
-        }
-        return INSTANCE;
     }
 
     @Override
@@ -72,5 +62,12 @@ public class SessionController implements Controller {
             }
         }
         return null;
+    }
+
+    public static synchronized SessionController getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new SessionController();
+        }
+        return INSTANCE;
     }
 }
