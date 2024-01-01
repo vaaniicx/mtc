@@ -1,4 +1,4 @@
-package at.if22b208.mtc.dto.user;
+package at.if22b208.mtc.dto;
 
 import lombok.Getter;
 
