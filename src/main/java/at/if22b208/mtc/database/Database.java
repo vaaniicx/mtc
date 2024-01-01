@@ -1,6 +1,5 @@
 package at.if22b208.mtc.database;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,25 +9,33 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@Builder
 @Getter
-public class DatabaseConnection implements AutoCloseable {
+public class Database implements AutoCloseable {
+    private static Database INSTANCE;
+    // TODO: config file
     private static final String DB_USER = "postgres";
-    private static final String DB_PASSWORD = "secret";
+    private static final String DB_PASSWORD = "admin";
     private static final String DB_HOST = "localhost";
     private static final String DB_PORT = "5432";
-    private static final String DB_SCHEMA = "public.";
+    private static final String DB_SCHEMA = "mtc";
     private Connection connection;
+
+    private Database() {
+    }
 
     public void connect() {
         String url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_SCHEMA + "?user=" + DB_USER +
                 "&password=" + DB_PASSWORD;
         try {
             this.connection = DriverManager.getConnection(url);
-            log.info("Connected to the PostgreSQL server successfully");
+            log.info("Connected to the PostgreSQL database successfully");
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
+    }
+
+    public boolean isConnected() {
+        return this.connection != null;
     }
 
     public void executeUpdateQuery(String query, Object... params) {
@@ -43,19 +50,21 @@ public class DatabaseConnection implements AutoCloseable {
     }
 
     public UUID executeCreateQuery(String query, Object... params) {
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try (PreparedStatement statement = connection.prepareStatement(query,
+                Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
             }
-            int affectedRows = statement.executeUpdate();
 
+            int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
                 log.error("Creating query failed, no rows affected.");
+                return null;
             }
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    return UUID.fromString(generatedKeys.getString(1));
+                    return (UUID) generatedKeys.getObject(1);
                 }
             }
         } catch (SQLException e) {
@@ -91,6 +100,13 @@ public class DatabaseConnection implements AutoCloseable {
             log.error(e.getMessage());
         }
         return result;
+    }
+
+    public static synchronized Database getINSTANCE() {
+        if (INSTANCE == null) {
+            INSTANCE = new Database();
+        }
+        return INSTANCE;
     }
 
     @Override

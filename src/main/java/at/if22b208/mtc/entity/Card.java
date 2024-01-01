@@ -1,7 +1,7 @@
-package at.if22b208.mtc.model;
+package at.if22b208.mtc.entity;
 
-import at.if22b208.mtc.model.enumeration.CardType;
-import at.if22b208.mtc.model.enumeration.ElementType;
+import at.if22b208.mtc.entity.enumeration.CardType;
+import at.if22b208.mtc.entity.enumeration.ElementType;
 
 public class Card {
     private String name;
