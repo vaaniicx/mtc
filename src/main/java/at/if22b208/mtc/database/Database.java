@@ -49,7 +49,7 @@ public class Database implements AutoCloseable {
         }
     }
 
-    public UUID executeCreateQuery(String query, Object... params) {
+    public UUID executeInsertQuery(String query, Object... params) {
         try (PreparedStatement statement = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < params.length; i++) {

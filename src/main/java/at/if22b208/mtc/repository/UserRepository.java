@@ -46,10 +46,7 @@ public class UserRepository implements Repository<User, UUID> {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, username, password, balance) VALUES " +
                 "((" + GENERATE_UUID_SEQUENCE_STRING + "), ?, ?, ?)";
         val database = Database.getINSTANCE();
-        UUID uuid = database.executeCreateQuery(query, user.getUsername(), user.getPassword(), user.getBalance());
-
-        log.info("Generated UUID: {}", uuid);
-
+        UUID uuid = database.executeInsertQuery(query, user.getUsername(), user.getPassword(), user.getBalance());
         return user.withUuid(uuid);
     }
 

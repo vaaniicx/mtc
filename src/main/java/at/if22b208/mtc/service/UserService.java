@@ -5,7 +5,6 @@ import at.if22b208.mtc.repository.UserRepository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class UserService implements Service<User, UUID> {
@@ -20,13 +19,15 @@ public class UserService implements Service<User, UUID> {
 
     @Override
     public User getById(UUID uuid) {
-        Optional<User> optional = UserRepository.getInstance().findById(uuid);
-        return optional.orElse(null);
+        return UserRepository.getInstance()
+                .findById(uuid)
+                .orElse(null);
     }
 
     public User getByUsername(String username) {
-        Optional<User> optional = UserRepository.getInstance().findByUsername(username);
-        return optional.orElse(null);
+        return UserRepository.getInstance()
+                .findByUsername(username)
+                .orElse(null);
     }
 
     @Override
