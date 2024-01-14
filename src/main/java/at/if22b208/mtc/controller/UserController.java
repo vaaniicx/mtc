@@ -67,9 +67,9 @@ public class UserController implements Controller {
     @Override
     public Response handleRequest(Request request) throws JsonProcessingException, HashingException {
         String root = request.getRoot();
-        String body = request.getBody() == null ? "" : request.getBody().toLowerCase(); // TODO: error handling
 
         if (root.equalsIgnoreCase("users")) {
+            String body = request.getBody();
             if (request.getMethod() == Method.POST) {
                 if (request.getPathParts().size() == 1) {
                     UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
