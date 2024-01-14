@@ -1,12 +1,17 @@
 package at.if22b208.mtc.service;
 
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.BalanceTransactionException;
+import at.if22b208.mtc.exception.NegativeBalanceException;
 import at.if22b208.mtc.repository.UserRepository;
+import at.if22b208.mtc.util.balance.BalanceOperation;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 public class UserService implements Service<User, UUID> {
     private static UserService INSTANCE;
 
@@ -32,12 +37,29 @@ public class UserService implements Service<User, UUID> {
 
     @Override
     public User create(User user) {
-        if (getByUsername(user.getUsername()) == null) {
+        if (getByUsername(user.getUsername()) != null) {
             return null;
         }
-
         user.setBalance(BigInteger.valueOf(20));
         return UserRepository.getInstance().create(user);
+    }
+
+    /**
+     * Updates the balance of a user based on the provided amount and operation.
+     *
+     * @param user      The user whose balance needs to be updated.
+     * @param amount    The amount to update the balance by.
+     * @param operation The operation to perform on the balance.
+     */
+    public void updateBalance(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+        try {
+            BigInteger newBalance = operation.operate(user.getBalance(), amount);
+            user.setBalance(newBalance);
+            UserRepository.getInstance().updateBalance(user);
+        } catch (NegativeBalanceException e) {
+            log.error("Error occurred during balance transaction. No operation performed.", e);
+            throw new BalanceTransactionException("Error updating balance.");
+        }
     }
 
     public static synchronized UserService getInstance() {

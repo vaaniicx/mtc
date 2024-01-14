@@ -37,6 +37,7 @@ public class UserRepository implements Repository<User, UUID> {
         Optional<User> user = Optional.empty();
         for (Row row : result.getRows()) {
             user = Optional.of(buildUserFromRow(row));
+            // TODO: Mehr als 1 Ergebnis
         }
         return user;
     }
@@ -48,6 +49,17 @@ public class UserRepository implements Repository<User, UUID> {
         val database = Database.getINSTANCE();
         UUID uuid = database.executeInsertQuery(query, user.getUsername(), user.getPassword(), user.getBalance());
         return user.withUuid(uuid);
+    }
+
+    /**
+     * Updates the balance of the user in the database.
+     *
+     * @param user The user whose balance needs to be updated.
+     */
+    public void updateBalance(User user) {
+        String query = "UPDATE " + SCHEMA + TABLE + " SET balance = ? WHERE uuid = ?";
+        val database = Database.getINSTANCE();
+        database.executeUpdateQuery(query, user.getBalance(), user.getUuid());
     }
 
     private User buildUserFromRow(Row row) {
