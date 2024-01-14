@@ -23,17 +23,22 @@ public class ResponseUtils {
         return new Response(HttpStatus.FORBIDDEN, ContentType.PLAIN_TEXT, message);
     }
 
+    public static Response noContent(String message) {
+        return new Response(HttpStatus.NO_CONTENT, ContentType.PLAIN_TEXT, message);
+    }
+
     public static Response notFound(String message) {
         return new Response(HttpStatus.NOT_FOUND, ContentType.PLAIN_TEXT, message);
     }
 
-    public static Response ok(String message) {
-        return new Response(HttpStatus.OK, ContentType.PLAIN_TEXT, message);
+    public static Response notImplemented() {
+        return new Response(HttpStatus.NOT_IMPLEMENTED, ContentType.PLAIN_TEXT, MessageConstants.NOT_IMPLEMENTED);
     }
 
     public static Response ok(ContentType type, String message) {
         return new Response(HttpStatus.OK, type, message);
     }
+
     public static Response unauthorized() {
         return new Response(HttpStatus.UNAUTHORIZED, ContentType.PLAIN_TEXT, MessageConstants.UNAUTHORIZED);
     }
