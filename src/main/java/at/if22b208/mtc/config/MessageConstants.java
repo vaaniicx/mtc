@@ -8,6 +8,7 @@ public class MessageConstants {
 
     // GENERAL
     public static final String UNAUTHORIZED = "Access token is missing or invalid.";
+    public static final String NOT_IMPLEMENTED = "Not implemented.";
 
     // USER
     public static final String USER_CREATED = "User successfully created.";
@@ -20,6 +21,7 @@ public class MessageConstants {
     public static final String USER_NO_CARDS = "The request was fine, but the user doesn't have any cards.";
 
     // DECK
+    public static final String DECK_NO_CARDS = "The request was fine, but the deck doesn't have any cards.";
     public static final String CONFIGURE_DECK = "The deck has been successfully configured.";
     public static final String CONFIGURE_DECK_FAILURE = "The provided deck did not include the required amount of cards.";
     public static final String CONFIGURE_DECK_CARD_UNAVAILABLE = "At least one of the provided cards does not belong to the user or is not available.";
