@@ -12,8 +12,6 @@ import java.util.Base64;
 
 @Slf4j
 public class HashingUtils {
-
-    public static final int DEFAULT_COST = 16;
     private static final String ALGORITHM = "PBKDF2WithHmacSHA1";
 
     /**
