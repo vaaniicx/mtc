@@ -30,7 +30,7 @@ public class MonsterTradingCardsApplication {
         router.addController("/users", UserController.getInstance());
         router.addController("/sessions", SessionController.getInstance());
         router.addController("/packages", PackageController.getInstance());
-        router.addController("/transactions", PackageController.getInstance());
+        router.addController("/transactions", TransactionController.getInstance());
         router.addController("/cards", CardController.getInstance());
         router.addController("/deck", CardController.getInstance());
         router.addController("/stats", null);
