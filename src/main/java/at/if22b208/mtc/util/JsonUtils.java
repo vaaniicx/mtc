@@ -2,12 +2,14 @@ package at.if22b208.mtc.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 /**
  * Utility class for handling JSON serialization and deserialization using Jackson.
  */
+@Slf4j
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
     // TODO: Error handling
@@ -15,10 +17,10 @@ public class JsonUtils {
     /**
      * Deserializes a JSON string into an object of the specified type.
      *
-     * @param <T>   The type of the target object.
-     * @param json  The JSON string to deserialize.
-     * @param type  The class representing the target type.
-     * @return      An object of the specified type.
+     * @param <T>  The type of the target object.
+     * @param json The JSON string to deserialize.
+     * @param type The class representing the target type.
+     * @return An object of the specified type.
      * @throws JsonProcessingException If an error occurs during deserialization.
      */
     public static <T> T getObjectFromJsonString(String json, Class<T> type) throws JsonProcessingException {
@@ -28,10 +30,10 @@ public class JsonUtils {
     /**
      * Deserializes a JSON string into a list of objects of the specified type.
      *
-     * @param <T>   The type of the elements in the list.
-     * @param json  The JSON string to deserialize.
-     * @param type  The class representing the target type.
-     * @return      A list of objects of the specified type.
+     * @param <T>  The type of the elements in the list.
+     * @param json The JSON string to deserialize.
+     * @param type The class representing the target type.
+     * @return A list of objects of the specified type.
      * @throws JsonProcessingException If an error occurs during deserialization.
      */
     public static <T> List<T> getListFromJsonString(String json, Class<T> type) throws JsonProcessingException {
@@ -41,12 +43,24 @@ public class JsonUtils {
     /**
      * Serializes an object to a JSON string.
      *
-     * @param <T>     The type of the object.
-     * @param object  The object to serialize.
-     * @return        A JSON string representing the serialized object.
+     * @param <T>    The type of the object.
+     * @param object The object to serialize.
+     * @return A JSON string representing the serialized object.
      * @throws JsonProcessingException If an error occurs during serialization.
      */
     public static <T> String getJsonStringFromObject(T object) throws JsonProcessingException {
         return mapper.writeValueAsString(object);
+    }
+
+    /**
+     * Serializes an array to a JSON string.
+     *
+     * @param <T>   The type of the array.
+     * @param array The array to serialize.
+     * @return A JSON string representing the serialized array.
+     * @throws JsonProcessingException If an error occurs during serialization.
+     */
+    public static <T> String getJsonStringFromArray(T[] array) throws JsonProcessingException {
+        return mapper.writeValueAsString(array);
     }
 }
