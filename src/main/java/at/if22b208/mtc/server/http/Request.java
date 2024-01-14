@@ -50,4 +50,12 @@ public class Request {
             }
         }
     }
+
+    public String getRoot() {
+        return this.getPathParts().get(0) == null ? "" : this.getPathParts().get(0);
+    }
+
+    public String getBody() {
+        return this.body == null ? "" : this.body.toLowerCase();
+    }
 }
