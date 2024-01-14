@@ -27,7 +27,6 @@ public class MessageConstants {
     // PACKAGE
     public static final String PACKAGE_CREATED = "Package and cards successfully created.";
     public static final String PACKAGE_CARD_ALREADY_EXISTS = "At least one card in the packages already exists.";
-    public static final String PACKAGE_ACQUIRED = "A package has been successfully bought.";
     public static final String INSUFFICIENT_FUNDS = "Not enough money for buying a card package.";
     public static final String NO_PACKAGE_AVAILABLE = "No card package available for buying.";
 
