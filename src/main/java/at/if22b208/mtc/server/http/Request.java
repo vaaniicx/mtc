@@ -55,6 +55,10 @@ public class Request {
         return this.getPathParts().get(0) == null ? "" : this.getPathParts().get(0);
     }
 
+    public String getSecondPathPart() {
+        return this.getPathParts().get(1) == null ? "" : this.getPathParts().get(1);
+    }
+
     public String getBody() {
         return this.body == null ? "" : this.body.toLowerCase();
     }
