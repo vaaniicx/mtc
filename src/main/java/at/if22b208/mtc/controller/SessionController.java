@@ -24,6 +24,7 @@ public class SessionController implements Controller {
     private static SessionController INSTANCE;
 
     private SessionController() {
+        // hide constructor
     }
 
     /**
