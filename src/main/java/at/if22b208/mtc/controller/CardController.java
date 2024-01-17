@@ -24,7 +24,7 @@ public class CardController implements Controller {
         // hide constructor
     }
 
-    private Response getCards(String username, String contentType) throws JsonProcessingException {
+    private Response getCards(String username) throws JsonProcessingException {
         User user = UserService.getInstance().getByUsername(username);
 
         if (user != null) {
@@ -46,12 +46,11 @@ public class CardController implements Controller {
         }
 
         // Retrieve the username from the user session
-        String token = SessionUtils.getBearerToken(request.getHeader());
-        String username = SessionUtils.getUsernameFromUserSession(token);
+        String username = SessionUtils.getUsernameFromHeader(request.getHeader());
 
         String root = request.getRoot();
         if ("cards".equals(root) && request.getMethod() == Method.GET) {
-            return this.getCards(username, request.getHeader().getContentType());
+            return this.getCards(username);
         }
         return ResponseUtils.notImplemented();
     }
