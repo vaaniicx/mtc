@@ -2,6 +2,7 @@ package at.if22b208.mtc.server.http;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Header {
     public static final String CONTENT_LENGTH_HEADER = "Content-Length";
@@ -25,8 +26,10 @@ public class Header {
         return Integer.parseInt(header);
     }
 
-    public void print() {
-        System.out.println(headers);
+    public String getContentType() {
+        return Optional
+                .ofNullable(this.headers.get("Content-Type"))
+                .orElse("");
     }
 }
 
