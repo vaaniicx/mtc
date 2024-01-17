@@ -45,26 +45,23 @@ public class TransactionController implements Controller {
     private Response acquirePackage(String username) throws JsonProcessingException {
         try {
             User user = UserService.getInstance().getByUsername(username); // Get the user associated with the username
-
-            if (user != null) { // Check if the user exists
-                // Update the user's balance by subtracting the package cost
-                UserService.getInstance()
-                        .updateBalance(user, MtcConstants.PACKAGE_COST, new SubtractOperation());
-
-                CardService cardService = CardService.getInstance();
-                List<Card> pack = cardService.getPackage();
-
-                // Iterate over cards in the acquired package and update their owner to the current user
-                pack.forEach(card -> cardService.updateOwner(card, user));
-
-                List<CardDto> dtoList = pack.stream()
-                        .map(CardMapper.INSTANCE::mapCardToCardDto)
-                        .toList();
-
-                return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtoList.toArray()));
-            } else {
+            if (user == null) {
                 return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
             }
+
+            // Update the user's balance by subtracting the package cost
+            UserService.getInstance()
+                    .updateBalance(user, MtcConstants.PACKAGE_COST, new SubtractOperation());
+
+            CardService cardService = CardService.getInstance();
+            List<Card> pack = cardService.getPackage();
+            // Iterate over cards in the acquired package and update their owner to the current user
+            pack.forEach(card -> cardService.updateOwner(card, user));
+
+            List<CardDto> dtoList = pack.stream()
+                    .map(CardMapper.INSTANCE::map)
+                    .toList();
+            return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtoList.toArray()));
         } catch (BalanceTransactionException e) {
             return ResponseUtils.forbidden(MessageConstants.INSUFFICIENT_FUNDS);
         } catch (InvalidPackageException e) {
@@ -82,13 +79,11 @@ public class TransactionController implements Controller {
         if (root.equalsIgnoreCase("transactions")) {
             if (request.getSecondPathPart().equals("packages") && request.getMethod() == Method.POST) {
                 // Retrieve the username from the user session
-                String token = SessionUtils.getBearerToken(request.getHeader());
-                String username = SessionUtils.getUsernameFromUserSession(token);
-
+                String username = SessionUtils.getUsernameFromHeader(request.getHeader());
                 return acquirePackage(username);
             }
         }
-        return null;
+        return ResponseUtils.notImplemented();
     }
 
     public static synchronized TransactionController getInstance() {
