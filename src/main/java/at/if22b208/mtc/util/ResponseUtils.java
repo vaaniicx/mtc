@@ -11,6 +11,10 @@ public class ResponseUtils {
         return new Response(HttpStatus.CONFLICT, ContentType.PLAIN_TEXT, message);
     }
 
+    public static Response badRequest(String message) {
+        return new Response(HttpStatus.BAD_REQUEST, ContentType.PLAIN_TEXT, message);
+    }
+
     public static Response created(String message) {
         return new Response(HttpStatus.CREATED, ContentType.PLAIN_TEXT, message);
     }
