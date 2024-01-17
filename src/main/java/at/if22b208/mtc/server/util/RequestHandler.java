@@ -4,6 +4,7 @@ import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.HttpStatus;
 import at.if22b208.mtc.server.http.Request;
 import at.if22b208.mtc.server.http.Response;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,11 +12,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+@Slf4j
 public class RequestHandler implements Runnable {
-    private Socket clientSocket;
-    private Router router;
-    private PrintWriter printWriter;
-    private BufferedReader bufferedReader;
+    private final Socket clientSocket;
+    private final Router router;
+    private final PrintWriter printWriter;
+    private final BufferedReader bufferedReader;
 
     public RequestHandler(Socket clientSocket, Router router) throws IOException {
         this.clientSocket = clientSocket;
@@ -41,7 +43,7 @@ public class RequestHandler implements Runnable {
             }
             printWriter.write(response.get());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } finally {
             try {
                 if (printWriter != null) {
@@ -52,7 +54,7 @@ public class RequestHandler implements Runnable {
                     clientSocket.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
         }
     }
