@@ -9,6 +9,11 @@ public class SessionUtils {
         return authorization != null && authorization.startsWith("Bearer ") && SessionManager.isValidSession(authorization);
     }
 
+    public static String getUsernameFromHeader(Header header) {
+        String token = SessionUtils.getBearerToken(header);
+        return SessionUtils.getUsernameFromUserSession(token);
+    }
+
     public static String getBearerToken(Header header) {
         String authorization = header.getHeader("Authorization");
 
@@ -18,7 +23,7 @@ public class SessionUtils {
         return null;
     }
 
-    public static String getUsernameFromUserSession(String token) {
+    private static String getUsernameFromUserSession(String token) {
         if (!SessionManager.isValidSession(token)) {
             return null;
         }
