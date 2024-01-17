@@ -33,11 +33,6 @@ public class CardController implements Controller {
             if (cards.isEmpty()) {
                 return ResponseUtils.noContent(MessageConstants.USER_NO_CARDS);
             }
-            if (ContentType.PLAIN_TEXT.type.equalsIgnoreCase(contentType)) {
-                StringBuilder b = new StringBuilder();
-                cards.forEach(b::append);
-                return ResponseUtils.ok(ContentType.PLAIN_TEXT, b.toString());
-            }
             return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(cards.toArray()));
         } else {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
