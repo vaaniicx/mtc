@@ -1,10 +1,12 @@
 package at.if22b208.mtc.service;
 
+import at.if22b208.mtc.entity.Card;
 import at.if22b208.mtc.entity.User;
 import at.if22b208.mtc.exception.BalanceTransactionException;
 import at.if22b208.mtc.exception.NegativeBalanceException;
 import at.if22b208.mtc.repository.UserRepository;
 import at.if22b208.mtc.util.balance.BalanceOperation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
@@ -57,9 +59,21 @@ public class UserService implements Service<User, UUID> {
             user.setBalance(newBalance);
             UserRepository.getInstance().updateBalance(user);
         } catch (NegativeBalanceException e) {
-            log.error("Error occurred during balance transaction. No operation performed.", e);
-            throw new BalanceTransactionException("Error updating balance.");
+            log.warn("Error occurred during balance transaction. No operation performed.", e);
+            throw new BalanceTransactionException("Error occurred during balance transaction. No operation performed.");
         }
+    }
+
+    public List<Card> getDeckByOwner(User user) throws JsonProcessingException {
+        return UserRepository.getInstance()
+                .getDeck(user)
+                .stream()
+                .map(CardService.getInstance()::getById)
+                .toList();
+    }
+
+    public void updateDeck(User user) throws JsonProcessingException {
+        UserRepository.getInstance().updateDeck(user);
     }
 
     public static synchronized UserService getInstance() {

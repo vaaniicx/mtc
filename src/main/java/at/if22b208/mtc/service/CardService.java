@@ -79,18 +79,6 @@ public class CardService implements Service<Card, UUID> {
                 .toList();
     }
 
-    public List<Card> getDeckByOwner(User user) {
-        return CardRepository.getInstance()
-                .findDeckByOwner(user)
-                .stream()
-                .flatMap(Optional::stream)
-                .toList();
-    }
-
-    public void updateDeckForOwner(User user, List<UUID> uuids) {
-        uuids.forEach(uuid -> CardRepository.getInstance().updateDeckByOwner(uuid, user));
-    }
-
     public List<Card> getPackage() throws InvalidPackageException {
         List<Card> cards = CardRepository.getInstance().findAvailablePackage()
                 .stream()
@@ -98,7 +86,7 @@ public class CardService implements Service<Card, UUID> {
                 .toList();
 
         if (cards.size() != 5) {
-            log.error("Invalid package size. Expected 5 cards, but found {} cards.", cards.size());
+            log.warn("Invalid package size. Expected 5 cards, but found {} cards.", cards.size());
             throw new InvalidPackageException("Invalid package size. Expected 5 cards.");
         }
         return cards;
