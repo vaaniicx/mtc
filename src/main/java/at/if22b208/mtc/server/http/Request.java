@@ -52,11 +52,11 @@ public class Request {
     }
 
     public String getRoot() {
-        return this.getPathParts().get(0) == null ? "" : this.getPathParts().get(0);
+        return this.getPathParts().get(0) == null ? "" : this.getPathParts().get(0).toLowerCase();
     }
 
     public String getSecondPathPart() {
-        return this.getPathParts().get(1) == null ? "" : this.getPathParts().get(1);
+        return this.getPathParts().get(1) == null ? "" : this.getPathParts().get(1).toLowerCase();
     }
 
     public String getBody() {
