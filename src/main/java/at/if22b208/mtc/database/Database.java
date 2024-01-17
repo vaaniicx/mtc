@@ -102,7 +102,7 @@ public class Database implements AutoCloseable {
         return result;
     }
 
-    public static synchronized Database getINSTANCE() {
+    public static synchronized Database getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Database();
         }
