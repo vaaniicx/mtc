@@ -10,6 +10,7 @@ package at.if22b208.mtc.entity;
 import at.if22b208.mtc.entity.enumeration.CardName;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 import lombok.With;
 
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.UUID;
  * A builder-pattern based class for creating instances of {@code Card}.
  */
 @Builder
+@ToString
 @Data
 public class Card {
     /**
