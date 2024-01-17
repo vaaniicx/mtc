@@ -43,7 +43,7 @@ public class CardRepository implements Repository<Card, UUID> {
     @Override
     public Optional<Card> findById(UUID uuid) {
         String query = "SELECT uuid, name, damage FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
-        val database = Database.getINSTANCE();
+        val database = Database.getInstance();
         val result = database.executeSelectQuery(query, uuid);
 
         Optional<Card> card = Optional.empty();
@@ -63,7 +63,7 @@ public class CardRepository implements Repository<Card, UUID> {
     public Card create(Card card) {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, name, damage, package_uuid, user_uuid)" +
                 " VALUES (?, ?, ?, ?, ?)";
-        val database = Database.getINSTANCE();
+        val database = Database.getInstance();
         database.executeInsertQuery(query,
                 card.getUuid(), card.getName(), card.getDamage(), card.getPackageUuid(), card.getUserUuid());
         return card;
@@ -72,7 +72,7 @@ public class CardRepository implements Repository<Card, UUID> {
     public List<Optional<Card>> findByOwner(User user) {
         String query = "SELECT uuid, name, damage, package_uuid, user_uuid FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid = ?";
-        val database = Database.getINSTANCE();
+        val database = Database.getInstance();
         Result result = database.executeSelectQuery(query, user.getUuid());
 
         List<Optional<Card>> cards = new ArrayList<>();
@@ -82,31 +82,12 @@ public class CardRepository implements Repository<Card, UUID> {
         return cards;
     }
 
-    public List<Optional<Card>> findDeckByOwner(User user) {
-        String query = "SELECT uuid, name, damage, package_uuid, user_uuid, deck FROM " + SCHEMA + TABLE +
-                " WHERE user_uuid = ? AND deck = ?";
-        val database = Database.getINSTANCE();
-        Result result = database.executeSelectQuery(query, user.getUuid(), true);
-
-        List<Optional<Card>> cards = new ArrayList<>();
-        for (Row row : result.getRows()) {
-            cards.add(Optional.of(buildCardFromRow(row)));
-        }
-        return cards;
-    }
-
-    public void updateDeckByOwner(UUID cardUuid, User user) {
-        String query = "UPDATE card SET deck = true WHERE card_uuid = ? and user_uuid = ?";
-        val database = Database.getINSTANCE();
-        database.executeUpdateQuery(query, cardUuid, user.getUuid());
-    }
-
     public List<Optional<Card>> findAvailablePackage() {
         String packageQuery = "WITH random_package AS (SELECT DISTINCT package_uuid FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid IS NULL LIMIT 1)";
         String query = packageQuery + " " + "SELECT uuid, name, damage, package_uuid, user_uuid FROM " + SCHEMA + TABLE +
                 " WHERE package_uuid = (SELECT package_uuid FROM random_package) LIMIT 5";
-        val database = Database.getINSTANCE();
+        val database = Database.getInstance();
         Result result = database.executeSelectQuery(query);
 
         List<Optional<Card>> cards = new ArrayList<>();
@@ -118,7 +99,7 @@ public class CardRepository implements Repository<Card, UUID> {
 
     public void updateOwner(Card card, User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET user_uuid = ? WHERE uuid = ?";
-        val database = Database.getINSTANCE();
+        val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getUuid(), card.getUuid());
     }
 
