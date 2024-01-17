@@ -9,5 +9,5 @@ import org.mapstruct.factory.Mappers;
 public interface CardMapper {
     CardMapper INSTANCE = Mappers.getMapper(CardMapper.class);
 
-    CardDto mapCardToCardDto(Card card);
+    CardDto map(Card card);
 }
