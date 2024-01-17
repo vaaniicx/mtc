@@ -15,8 +15,8 @@ public class MonsterTradingCardsApplication {
      * @param args args
      */
     public static void main(String[] args) {
-        Database.getINSTANCE().connect();
-        if (!Database.getINSTANCE().isConnected()) {
+        Database.getInstance().connect();
+        if (!Database.getInstance().isConnected()) {
             log.error("Not connected to database, shut down application.");
             return;
         }
@@ -32,7 +32,7 @@ public class MonsterTradingCardsApplication {
         router.addController("/packages", PackageController.getInstance());
         router.addController("/transactions", TransactionController.getInstance());
         router.addController("/cards", CardController.getInstance());
-        router.addController("/deck", CardController.getInstance());
+        router.addController("/deck", DeckController.getInstance());
         router.addController("/stats", null);
         router.addController("/scoreboard", null);
         router.addController("/battles", BattleController.getInstance());
