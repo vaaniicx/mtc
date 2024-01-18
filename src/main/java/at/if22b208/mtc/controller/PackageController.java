@@ -20,7 +20,6 @@ import at.if22b208.mtc.service.CardService;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -68,10 +67,9 @@ public class PackageController implements Controller {
      *
      * @param request The incoming HTTP request to be handled.
      * @return A response indicating the result of processing the request.
-     * @throws JsonProcessingException If there is an issue processing JSON data.
      */
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request) {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }

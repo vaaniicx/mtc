@@ -6,7 +6,6 @@ import at.if22b208.mtc.exception.BalanceTransactionException;
 import at.if22b208.mtc.exception.NegativeBalanceException;
 import at.if22b208.mtc.repository.UserRepository;
 import at.if22b208.mtc.util.balance.BalanceOperation;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
@@ -64,7 +63,7 @@ public class UserService implements Service<User, UUID> {
         }
     }
 
-    public List<Card> getDeckByOwner(User user) throws JsonProcessingException {
+    public List<Card> getDeckByOwner(User user) {
         return UserRepository.getInstance()
                 .getDeck(user)
                 .stream()
@@ -72,7 +71,7 @@ public class UserService implements Service<User, UUID> {
                 .toList();
     }
 
-    public void updateDeck(User user) throws JsonProcessingException {
+    public void updateDeck(User user) {
         UserRepository.getInstance().updateDeck(user);
     }
 

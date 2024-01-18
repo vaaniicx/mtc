@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,10 +22,13 @@ public class JsonUtils {
      * @param json The JSON string to deserialize.
      * @param type The class representing the target type.
      * @return An object of the specified type.
-     * @throws JsonProcessingException If an error occurs during deserialization.
      */
-    public static <T> T getObjectFromJsonString(String json, Class<T> type) throws JsonProcessingException {
-        return mapper.readValue(json, type);
+    public static <T> T getObjectFromJsonString(String json, Class<T> type) {
+        try {
+            return mapper.readValue(json, type);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
     /**
@@ -34,10 +38,13 @@ public class JsonUtils {
      * @param json The JSON string to deserialize.
      * @param type The class representing the target type.
      * @return A list of objects of the specified type.
-     * @throws JsonProcessingException If an error occurs during deserialization.
      */
-    public static <T> List<T> getListFromJsonString(String json, Class<T> type) throws JsonProcessingException {
-        return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, type));
+    public static <T> List<T> getListFromJsonString(String json, Class<T> type) {
+        try {
+            return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, type));
+        } catch (JsonProcessingException e) {
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -46,10 +53,13 @@ public class JsonUtils {
      * @param <T>    The type of the object.
      * @param object The object to serialize.
      * @return A JSON string representing the serialized object.
-     * @throws JsonProcessingException If an error occurs during serialization.
      */
-    public static <T> String getJsonStringFromObject(T object) throws JsonProcessingException {
-        return mapper.writeValueAsString(object);
+    public static <T> String getJsonStringFromObject(T object) {
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 
     /**
@@ -58,9 +68,12 @@ public class JsonUtils {
      * @param <T>   The type of the array.
      * @param array The array to serialize.
      * @return A JSON string representing the serialized array.
-     * @throws JsonProcessingException If an error occurs during serialization.
      */
-    public static <T> String getJsonStringFromArray(T[] array) throws JsonProcessingException {
-        return mapper.writeValueAsString(array);
+    public static <T> String getJsonStringFromArray(T[] array) {
+        try {
+            return mapper.writeValueAsString(array);
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 }

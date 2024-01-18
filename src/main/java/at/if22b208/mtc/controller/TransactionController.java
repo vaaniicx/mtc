@@ -19,7 +19,6 @@ import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.balance.SubtractOperation;
 import at.if22b208.mtc.util.mapper.CardMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -42,7 +41,7 @@ public class TransactionController implements Controller {
      * @param username The username of the user acquiring the package.
      * @return A {@link Response} indicating the result of the package acquisition.
      */
-    private Response acquirePackage(String username) throws JsonProcessingException {
+    private Response acquirePackage(String username) {
         try {
             User user = UserService.getInstance().getByUsername(username); // Get the user associated with the username
             if (user == null) {
@@ -70,7 +69,7 @@ public class TransactionController implements Controller {
     }
 
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request) {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }

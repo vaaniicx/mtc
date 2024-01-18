@@ -7,7 +7,6 @@ import at.if22b208.mtc.entity.Card;
 import at.if22b208.mtc.entity.User;
 import at.if22b208.mtc.service.CardService;
 import at.if22b208.mtc.util.JsonUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -73,7 +72,7 @@ public class UserRepository implements Repository<User, UUID> {
         database.executeUpdateQuery(query, user.getBalance(), user.getUuid());
     }
 
-    public List<UUID> getDeck(User user) throws JsonProcessingException {
+    public List<UUID> getDeck(User user) {
         String query = "SELECT deck FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query, user.getUuid());

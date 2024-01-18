@@ -13,7 +13,6 @@ import at.if22b208.mtc.service.UserService;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class CardController implements Controller {
         // hide constructor
     }
 
-    private Response getCards(String username) throws JsonProcessingException {
+    private Response getCards(String username) {
         User user = UserService.getInstance().getByUsername(username);
 
         if (user != null) {
@@ -40,7 +39,7 @@ public class CardController implements Controller {
     }
 
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request) {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }

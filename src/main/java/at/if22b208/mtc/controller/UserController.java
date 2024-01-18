@@ -16,7 +16,6 @@ import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -40,7 +39,7 @@ public class UserController implements Controller {
         return ResponseUtils.conflict(MessageConstants.USER_ALREADY_REGISTERED);
     }
 
-    private Response updateUserData(String username, UserDataDto dto) throws JsonProcessingException {
+    private Response updateUserData(String username, UserDataDto dto) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -53,7 +52,7 @@ public class UserController implements Controller {
         return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.USER_UPDATED);
     }
 
-    private Response getUserByUsername(String username) throws JsonProcessingException {
+    private Response getUserByUsername(String username) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -64,7 +63,7 @@ public class UserController implements Controller {
     }
 
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request) {
         String root = request.getRoot();
 
         if (root.equalsIgnoreCase("users")) {
@@ -73,6 +72,9 @@ public class UserController implements Controller {
                 if (request.getPathParts().size() == 1) {
                     UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
                     try {
+                        if (dto == null) {
+                            return ResponseUtils.notImplemented();
+                        }
                         return this.createUserWithCredentials(dto);
                     } catch (HashingException e) {
                         // TODO: Clean up
@@ -96,7 +98,7 @@ public class UserController implements Controller {
                 }
             }
         }
-        return null;
+        return ResponseUtils.notImplemented();
     }
 
     public static synchronized UserController getInstance() {

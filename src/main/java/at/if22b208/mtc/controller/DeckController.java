@@ -12,7 +12,6 @@ import at.if22b208.mtc.service.UserService;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 public class DeckController implements Controller {
     private static DeckController INSTANCE;
 
-    private Response getDeck(String username, String type) throws JsonProcessingException {
+    private Response getDeck(String username, String type) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -42,7 +41,7 @@ public class DeckController implements Controller {
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(deck.toArray()));
     }
 
-    private Response configureDeck(String username, List<UUID> uuids) throws JsonProcessingException {
+    private Response configureDeck(String username, List<UUID> uuids) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -67,7 +66,7 @@ public class DeckController implements Controller {
     }
 
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request) {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }

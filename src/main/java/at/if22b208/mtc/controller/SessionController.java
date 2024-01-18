@@ -14,7 +14,6 @@ import at.if22b208.mtc.service.UserService;
 import at.if22b208.mtc.util.HashingUtils;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
@@ -47,7 +46,7 @@ public class SessionController implements Controller {
                     return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));
                 }
             }
-        } catch (HashingException | JsonProcessingException e) {
+        } catch (HashingException e) {
             log.warn("Error during login for username '{}': {}", dto.getUsername(), e.getMessage());
         }
         // Unsuccessful login
@@ -56,7 +55,7 @@ public class SessionController implements Controller {
     }
 
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request) {
         String root = request.getRoot();
 
         if (root.equalsIgnoreCase("sessions")) {
@@ -64,11 +63,14 @@ public class SessionController implements Controller {
                 if (request.getPathParts().size() == 1) {
                     String body = request.getBody().toLowerCase();
                     UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
+                    if (dto == null) {
+                        return ResponseUtils.notImplemented();
+                    }
                     return login(dto);
                 }
             }
         }
-        return null;
+        return ResponseUtils.notImplemented();
     }
 
     public static synchronized SessionController getInstance() {
