@@ -1,11 +1,3 @@
-/**
- * The {@code PackageController} class is responsible for handling HTTP requests related to card packages.
- * It implements the {@link Controller} interface and ensures the creation of card packages by processing incoming requests.
- *
- * @author Vanessa Kausl
- * @version 1.0
- * @since 14.01.2023
- */
 package at.if22b208.mtc.controller;
 
 import at.if22b208.mtc.config.MessageConstants;

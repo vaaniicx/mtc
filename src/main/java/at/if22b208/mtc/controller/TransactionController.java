@@ -23,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+/**
+ * Controller class for handling card acquisition transactions.
+ */
 @Slf4j
 public class TransactionController implements Controller {
     private static TransactionController INSTANCE;
@@ -32,11 +35,7 @@ public class TransactionController implements Controller {
     }
 
     /**
-     * <p>Acquires a package of cards for the user with the provided username.</p>
-     *
-     * <p>This method retrieves the user associated with the given username, updates their balance
-     * by subtracting the cost of the package, and assigns ownership of the cards in the acquired
-     * package to the user. The package is expected to contain exactly 5 cards.</p>
+     * Acquires a package of cards for the user with the provided username.
      *
      * @param username The username of the user acquiring the package.
      * @return A {@link Response} indicating the result of the package acquisition.
@@ -68,6 +67,12 @@ public class TransactionController implements Controller {
         }
     }
 
+    /**
+     * Handles incoming HTTP requests related to card acquisition transactions.
+     *
+     * @param request The incoming HTTP request to be handled.
+     * @return A response indicating the result of processing the request.
+     */
     @Override
     public Response handleRequest(Request request) {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
@@ -85,6 +90,11 @@ public class TransactionController implements Controller {
         return ResponseUtils.notImplemented();
     }
 
+    /**
+     * Gets the singleton instance of the {@code TransactionController}.
+     *
+     * @return The singleton instance of the {@code TransactionController}.
+     */
     public static synchronized TransactionController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TransactionController();

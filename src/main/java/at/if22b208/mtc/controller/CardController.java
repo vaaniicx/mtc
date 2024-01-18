@@ -16,6 +16,9 @@ import at.if22b208.mtc.util.SessionUtils;
 
 import java.util.List;
 
+/**
+ * Controller class for handling card-related operations.
+ */
 public class CardController implements Controller {
     private static CardController INSTANCE;
 
@@ -23,6 +26,12 @@ public class CardController implements Controller {
         // hide constructor
     }
 
+    /**
+     * Retrieves a list of cards associated with the specified username.
+     *
+     * @param username The username of the user for whom to retrieve cards.
+     * @return Response containing the list of cards in JSON format.
+     */
     private Response getCards(String username) {
         User user = UserService.getInstance().getByUsername(username);
 
@@ -54,6 +63,11 @@ public class CardController implements Controller {
         return ResponseUtils.notImplemented();
     }
 
+    /**
+     * Gets the singleton instance of the {@code CardController}.
+     *
+     * @return The singleton instance of the {@code CardController}.
+     */
     public static synchronized CardController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new CardController();

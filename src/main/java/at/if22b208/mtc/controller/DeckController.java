@@ -19,9 +19,23 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class for handling deck-related operations.
+ */
 public class DeckController implements Controller {
     private static DeckController INSTANCE;
 
+    private DeckController() {
+        // hide constructor
+    }
+
+    /**
+     * Retrieves the user's deck based on the specified username and type.
+     *
+     * @param username The username of the user for whom to retrieve the deck.
+     * @param type     The type of deck format (e.g., "format=plain").
+     * @return Response containing the deck information in the specified format.
+     */
     private Response getDeck(String username, String type) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
@@ -41,6 +55,13 @@ public class DeckController implements Controller {
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(deck.toArray()));
     }
 
+    /**
+     * Configures the user's deck based on the specified username and card UUIDs.
+     *
+     * @param username The username of the user for whom to configure the deck.
+     * @param uuids    List of UUIDs representing the cards to include in the deck.
+     * @return Response indicating the success or failure of the deck configuration.
+     */
     private Response configureDeck(String username, List<UUID> uuids) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
@@ -86,6 +107,11 @@ public class DeckController implements Controller {
         return response;
     }
 
+    /**
+     * Gets the singleton instance of {@code DeckController}.
+     *
+     * @return The singleton instance of the {@code DeckController}.
+     */
     public static synchronized DeckController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new DeckController();

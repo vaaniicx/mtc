@@ -18,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
+/**
+ * Controller class for handling user sessions and login functionality.
+ */
 @Slf4j
 public class SessionController implements Controller {
     private static SessionController INSTANCE;
@@ -54,6 +57,12 @@ public class SessionController implements Controller {
         return ResponseUtils.unauthorized(MessageConstants.USER_LOGIN_INVALID_CREDENTIALS);
     }
 
+    /**
+     * Handles incoming HTTP requests related to user sessions and login.
+     *
+     * @param request The incoming HTTP request to be handled.
+     * @return A response indicating the result of processing the request.
+     */
     @Override
     public Response handleRequest(Request request) {
         String root = request.getRoot();
@@ -73,6 +82,11 @@ public class SessionController implements Controller {
         return ResponseUtils.notImplemented();
     }
 
+    /**
+     * Gets the singleton instance of the {@code SessionController}.
+     *
+     * @return The singleton instance of the {@code SessionController}.
+     */
     public static synchronized SessionController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new SessionController();

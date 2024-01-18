@@ -18,6 +18,9 @@ import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Controller class for handling user-related operations.
+ */
 @Slf4j
 public class UserController implements Controller {
     private static UserController INSTANCE;
@@ -26,6 +29,13 @@ public class UserController implements Controller {
         // hide constructor
     }
 
+    /**
+     * Creates a new user with the provided credentials.
+     *
+     * @param dto The user credentials DTO containing username and password.
+     * @return Response indicating the success or failure of the user creation.
+     * @throws HashingException If an error occurs during password hashing.
+     */
     private Response createUserWithCredentials(UserCredentialsDto dto) throws HashingException {
         User user = User.builder()
                 .username(dto.getUsername())
@@ -39,6 +49,13 @@ public class UserController implements Controller {
         return ResponseUtils.conflict(MessageConstants.USER_ALREADY_REGISTERED);
     }
 
+    /**
+     * Updates user data for the specified username.
+     *
+     * @param username The username of the user to update.
+     * @param dto      The user data DTO containing updated information.
+     * @return Response indicating the success or failure of the user data update.
+     */
     private Response updateUserData(String username, UserDataDto dto) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
@@ -52,6 +69,12 @@ public class UserController implements Controller {
         return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.USER_UPDATED);
     }
 
+    /**
+     * Retrieves user information for the specified username.
+     *
+     * @param username The username of the user to retrieve.
+     * @return Response containing user information in JSON format.
+     */
     private Response getUserByUsername(String username) {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
@@ -101,6 +124,11 @@ public class UserController implements Controller {
         return ResponseUtils.notImplemented();
     }
 
+    /**
+     * Gets the singleton instance of the {@code UserController}.
+     *
+     * @return The singleton instance of the {@code UserController}.
+     */
     public static synchronized UserController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new UserController();
