@@ -15,6 +15,7 @@ import at.if22b208.mtc.util.HashingUtils;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
+import at.if22b208.mtc.util.mapper.UserMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,33 +40,31 @@ public class UserController implements Controller {
         return ResponseUtils.conflict(MessageConstants.USER_ALREADY_REGISTERED);
     }
 
-    private Response updateUserData(String username, UserDataDto dto) {
+    private Response updateUserData(String username, UserDataDto dto) throws JsonProcessingException {
         User user = UserService.getInstance().getByUsername(username);
-
-        if (user != null) {
-            // TODO: Update user
+        if (user == null) {
+            return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
         }
-        return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
+
+        user.setName(dto.getName());
+        user.setBiography(dto.getBiography());
+        user.setImage(dto.getImage());
+        UserService.getInstance().updateUserData(user);
+        return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.USER_UPDATED);
     }
 
     private Response getUserByUsername(String username) throws JsonProcessingException {
         User user = UserService.getInstance().getByUsername(username);
-
-        if (user != null) {
-            UserDataDto dto = UserDataDto.builder() // TODO: set values
-                    .name("")
-                    .biography("")
-                    .image("")
-                    .build();
-
-            return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(dto));
+        if (user == null) {
+            return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
         }
-        return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
+
+        UserDataDto dto = UserMapper.INSTANCE.map(user);
+        return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(dto));
     }
 
-
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException, HashingException {
+    public Response handleRequest(Request request) throws JsonProcessingException {
         String root = request.getRoot();
 
         if (root.equalsIgnoreCase("users")) {
@@ -73,7 +72,12 @@ public class UserController implements Controller {
             if (request.getMethod() == Method.POST) {
                 if (request.getPathParts().size() == 1) {
                     UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
-                    return this.createUserWithCredentials(dto);
+                    try {
+                        return this.createUserWithCredentials(dto);
+                    } catch (HashingException e) {
+                        // TODO: Clean up
+                        log.warn(e.getMessage());
+                    }
                 }
             }
 

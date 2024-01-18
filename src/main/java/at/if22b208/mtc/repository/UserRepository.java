@@ -55,6 +55,12 @@ public class UserRepository implements Repository<User, UUID> {
         return user.withUuid(uuid);
     }
 
+    public void updateUserData(User user) {
+        String query = "UPDATE " + SCHEMA + TABLE + " SET name = ?, biography = ?, image = ? WHERE uuid = ?";
+        val database = Database.getInstance();
+        database.executeUpdateQuery(query, user.getName(), user.getBiography(), user.getImage(), user.getUuid());
+    }
+
     /**
      * Updates the balance of the user in the database.
      *

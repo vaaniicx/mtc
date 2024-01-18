@@ -82,4 +82,9 @@ public class UserService implements Service<User, UUID> {
         }
         return INSTANCE;
     }
+
+    public void updateUserData(User user) {
+        UserRepository.getInstance().updateUserData(user);
+    }
 }
+
