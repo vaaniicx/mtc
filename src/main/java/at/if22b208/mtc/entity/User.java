@@ -51,4 +51,7 @@ public class User {
      * The list of cards in the user's deck.
      */
     private List<Card> deck;
+    private String name;
+    private String biography;
+    private String image;
 }
