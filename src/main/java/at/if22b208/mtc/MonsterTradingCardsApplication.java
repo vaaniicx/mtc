@@ -33,8 +33,8 @@ public class MonsterTradingCardsApplication {
         router.addController("/transactions", TransactionController.getInstance());
         router.addController("/cards", CardController.getInstance());
         router.addController("/deck", DeckController.getInstance());
-        router.addController("/stats", null);
-        router.addController("/scoreboard", null);
+        router.addController("/stats", StatisticController.getInstance());
+        router.addController("/scoreboard", ScoreboardController.getInstance());
         router.addController("/battles", BattleController.getInstance());
         router.addController("/tradings", null);
         return router;
