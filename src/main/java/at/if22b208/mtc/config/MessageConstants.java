@@ -15,7 +15,7 @@ public class MessageConstants {
     public static final String USER_ALREADY_REGISTERED = "User with same username already registered.";
     public static final String USER_NOT_FOUND = "User not found.";
     public static final String USER_UPDATED = "User successfully updated.";
-    public static final String USER_LOGIN = "User login successful.";
+    public static final String USER_UPDATE_FAILURE = "The provided name does not start with the user's username.";
     public static final String USER_LOGIN_INVALID_CREDENTIALS = "Invalid username/password provided.";
     public static final String INSUFFICIENT_PRIVILEGE = "Provided user is not \"admin\".";
     public static final String USER_NO_CARDS = "The request was fine, but the user doesn't have any cards.";
