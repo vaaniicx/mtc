@@ -30,7 +30,7 @@ public class CardRepository implements Repository<Card, UUID> {
      * @return A list of all cards in the database.
      */
     @Override
-    public List<Card> findAll() {
+    public List<Optional<Card>> findAll() {
         return null;
     }
 
