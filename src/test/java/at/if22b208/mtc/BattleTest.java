@@ -30,7 +30,6 @@ class BattleTest {
         battle = new Battle();
         battle.setPlayerA(playerA);
         battle.setPlayerB(playerB);
-        battle.setRounds(new ArrayList<>());
     }
 
     @Test
