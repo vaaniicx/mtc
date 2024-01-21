@@ -1,15 +1,16 @@
 package at.if22b208.mtc.entity;
 
 import at.if22b208.mtc.config.MtcConstants;
+import at.if22b208.mtc.entity.enumeration.AttackEffectiveness;
 import at.if22b208.mtc.entity.enumeration.CardElementType;
 import at.if22b208.mtc.entity.enumeration.CardType;
-import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Represents a battle between two players with decks of cards.
@@ -17,11 +18,12 @@ import java.util.List;
 @Data
 @Slf4j
 public class Battle {
+    private CountDownLatch latch = new CountDownLatch(2);
     private User playerA;
     private User playerB;
-    private List<Round> rounds;
     private User winner;
     private boolean isDraw = false;
+    private List<Round> rounds;
 
     /**
      * Initiates the battle between two players, playing a series of rounds until a winner is determined.
@@ -353,24 +355,4 @@ public class Battle {
             }
         }
     }
-}
-
-/**
- * Represents a single round in a battle with information about the cards involved.
- */
-@Builder
-@Data
-class Round {
-    private int number;
-    private Card roundWinnerCard;
-    private Card roundLoserCard;
-}
-
-/**
- * Enumerates the effectiveness of an attack in a battle.
- */
-enum AttackEffectiveness {
-    EFFECTIVE,
-    NOT_EFFECTIVE,
-    NO_EFFECT
 }
