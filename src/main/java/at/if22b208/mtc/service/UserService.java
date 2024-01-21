@@ -70,6 +70,39 @@ public class UserService implements Service<User, UUID> {
         }
     }
 
+    public void updateElo(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+        try {
+            BigInteger newElo = operation.operate(BigInteger.valueOf(user.getElo()), amount);
+            user.setElo(newElo.intValue());
+            UserRepository.getInstance().updateElo(user);
+        } catch (NegativeBalanceException e) {
+            log.warn("Error occurred during elo update. No operation performed.", e);
+            throw new BalanceTransactionException("Error occurred during elo transaction. No operation performed.");
+        }
+    }
+
+    public void updateLoss(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+        try {
+            BigInteger newLosses = operation.operate(BigInteger.valueOf(user.getLosses()), amount);
+            user.setLosses(newLosses.intValue());
+            UserRepository.getInstance().updateLoss(user);
+        } catch (NegativeBalanceException e) {
+            log.warn("Error occurred during losses update. No operation performed.", e);
+            throw new BalanceTransactionException("Error occurred during losses update. No operation performed.");
+        }
+    }
+
+    public void updateWin(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+        try {
+            BigInteger newWins = operation.operate(BigInteger.valueOf(user.getWins()), amount);
+            user.setWins(newWins.intValue());
+            UserRepository.getInstance().updateWin(user);
+        } catch (NegativeBalanceException e) {
+            log.warn("Error occurred during losses update. No operation performed.", e);
+            throw new BalanceTransactionException("Error occurred during losses update. No operation performed.");
+        }
+    }
+
     public List<Card> getDeckByOwner(User user) {
         Optional<User> optional = UserRepository.getInstance().findByUsername(user.getUsername());
         return optional.map(User::getDeck).orElse(new ArrayList<>());

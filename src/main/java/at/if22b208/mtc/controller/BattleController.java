@@ -1,7 +1,9 @@
 package at.if22b208.mtc.controller;
 
+import at.if22b208.mtc.config.MessageConstants;
 import at.if22b208.mtc.entity.Battle;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.BalanceTransactionException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Method;
@@ -9,10 +11,13 @@ import at.if22b208.mtc.server.http.Request;
 import at.if22b208.mtc.server.http.Response;
 import at.if22b208.mtc.service.BattleService;
 import at.if22b208.mtc.service.UserService;
-import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
+import at.if22b208.mtc.util.balance.AddOperation;
+import at.if22b208.mtc.util.balance.SubtractOperation;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.math.BigInteger;
 
 public class BattleController implements Controller {
     private static BattleController INSTANCE;
@@ -25,10 +30,33 @@ public class BattleController implements Controller {
         try {
             Battle battle = BattleService.getInstance().enterBattleQueue(user);
 
-            return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(battle));
+            if (battle.isDraw()) {
+                return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.BATTLE_DRAW);
+            }
+
+            if (battle.getWinner().getUuid() == battle.getPlayerA().getUuid()) {
+                updateUserStatisticData(battle.getPlayerA(), battle.getPlayerB());
+            } else {
+                updateUserStatisticData(battle.getPlayerB(), battle.getPlayerA());
+            }
+
+            int roundsPlayed = battle.getRounds().size();
+            return ResponseUtils.ok(ContentType.PLAIN_TEXT, "Rounds played: " + roundsPlayed + ", Winner is: " + battle.getWinner().getUsername());
         } catch (InterruptedException e) {
             return ResponseUtils.error(":D");
+        } catch (BalanceTransactionException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private static void updateUserStatisticData(User winner, User loser) throws BalanceTransactionException {
+        // Update winner data
+        UserService.getInstance().updateElo(winner, BigInteger.valueOf(3), new AddOperation());
+        UserService.getInstance().updateWin(winner, BigInteger.valueOf(1), new AddOperation());
+
+        // Update loser data
+        UserService.getInstance().updateElo(loser, BigInteger.valueOf(5), new SubtractOperation());
+        UserService.getInstance().updateLoss(loser, BigInteger.valueOf(1), new AddOperation());
     }
 
     @Override

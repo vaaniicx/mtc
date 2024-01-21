@@ -80,6 +80,24 @@ public class UserRepository implements Repository<User, UUID> {
         database.executeUpdateQuery(query, user.getBalance(), user.getUuid());
     }
 
+    public void updateElo(User user) {
+        String query = "UPDATE " + SCHEMA + TABLE + " SET elo = ? WHERE uuid = ?";
+        val database = Database.getInstance();
+        database.executeUpdateQuery(query, user.getElo(), user.getUuid());
+    }
+
+    public void updateLoss(User user) {
+        String query = "UPDATE " + SCHEMA + TABLE + " SET losses = ? WHERE uuid = ?";
+        val database = Database.getInstance();
+        database.executeUpdateQuery(query, user.getLosses(), user.getUuid());
+    }
+
+    public void updateWin(User user) {
+        String query = "UPDATE " + SCHEMA + TABLE + " SET wins = ? WHERE uuid = ?";
+        val database = Database.getInstance();
+        database.executeUpdateQuery(query, user.getWins(), user.getUuid());
+    }
+
     public void updateDeck(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET deck = ? WHERE uuid = ?";
         val database = Database.getInstance();
@@ -103,6 +121,9 @@ public class UserRepository implements Repository<User, UUID> {
                 .name(row.getString("name"))
                 .biography(row.getString("biography"))
                 .image(row.getString("image"))
+                .elo(row.getInt("elo"))
+                .wins(row.getInt("wins"))
+                .losses(row.getInt("losses"))
                 .build();
     }
 
