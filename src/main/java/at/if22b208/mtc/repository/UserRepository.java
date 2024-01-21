@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,11 +22,18 @@ public class UserRepository implements Repository<User, UUID> {
     private static final String TABLE = "user";
 
     private UserRepository() {
+        // hide constructor
     }
 
-    @Override
-    public List<User> findAll() {
-        return null;
+    public List<Optional<User>> findAll() {
+        String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses FROM " + SCHEMA + TABLE;
+        val database = Database.getInstance();
+        Result result = database.executeSelectQuery(query);
+        List<Optional<User>> users = new ArrayList<>();
+        for (Row row : result.getRows()) {
+            users.add(Optional.of(buildUserFromRow(row)));
+        }
+        return users;
     }
 
     @Override
@@ -34,8 +42,8 @@ public class UserRepository implements Repository<User, UUID> {
     }
 
     public Optional<User> findByUsername(String username) {
-        String query = "SELECT uuid, username, password, balance, deck, name, biography, image FROM " + SCHEMA + TABLE +
-                " WHERE username = ?";
+        String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses FROM "
+                + SCHEMA + TABLE + " WHERE username = ?";
         val database = Database.getInstance();
         val result = database.executeSelectQuery(query, username);
 
@@ -72,17 +80,6 @@ public class UserRepository implements Repository<User, UUID> {
         database.executeUpdateQuery(query, user.getBalance(), user.getUuid());
     }
 
-    public List<UUID> getDeck(User user) {
-        String query = "SELECT deck FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
-        val database = Database.getInstance();
-        Result result = database.executeSelectQuery(query, user.getUuid());
-        String json = "";
-        for (Row row : result.getRows()) {
-            json = row.getString("deck");
-        }
-        return JsonUtils.getListFromJsonString(json, UUID.class);
-    }
-
     public void updateDeck(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET deck = ? WHERE uuid = ?";
         val database = Database.getInstance();
@@ -95,16 +92,25 @@ public class UserRepository implements Repository<User, UUID> {
                 .uuid(row.getUuid("uuid"))
                 .username(row.getString("username"))
                 .password(row.getString("password"))
-                .balance(BigInteger.valueOf(row.getLong("balance"))).
-                deck(JsonUtils.getListFromJsonString(row.getString("deck"), UUID.class)
-                        .stream()
-                        .map(CardService.getInstance()::getById)
-                        .toList())
+                .balance(BigInteger.valueOf(row.getLong("balance")))
+                .deck(row.getString("deck") == null ?
+                        new ArrayList<>() :
+                        JsonUtils.getListFromJsonString(row.getString("deck"), UUID.class)
+                                .stream()
+                                .map(CardService.getInstance()::getById)
+                                .toList()
+                )
+                .name(row.getString("name"))
                 .biography(row.getString("biography"))
                 .image(row.getString("image"))
                 .build();
     }
 
+    /**
+     * Gets the singleton instance of the {@code UserRepository}.
+     *
+     * @return The singleton instance of the {@code UserRepository}.
+     */
     public static synchronized UserRepository getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new UserRepository();
