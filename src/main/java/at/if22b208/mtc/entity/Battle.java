@@ -23,7 +23,7 @@ public class Battle {
     private User playerB;
     private User winner;
     private boolean isDraw = false;
-    private List<Round> rounds;
+    private List<Round> rounds = new ArrayList<>();
 
     /**
      * Initiates the battle between two players, playing a series of rounds until a winner is determined.
