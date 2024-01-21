@@ -42,7 +42,7 @@ public class CardRepository implements Repository<Card, UUID> {
      */
     @Override
     public Optional<Card> findById(UUID uuid) {
-        String query = "SELECT uuid, name, damage FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
+        String query = "SELECT uuid, name, damage, user_uuid, package_id FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         val result = database.executeSelectQuery(query, uuid);
 
@@ -124,6 +124,8 @@ public class CardRepository implements Repository<Card, UUID> {
                 .uuid(row.getUuid("uuid"))
                 .name(row.getString("name"))
                 .damage(row.getInt("damage"))
+                .packageId(row.getInt("package_id"))
+                .userUuid(row.getUuid("user_uuid"))
                 .build();
     }
 
