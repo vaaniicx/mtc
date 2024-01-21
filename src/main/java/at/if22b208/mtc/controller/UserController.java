@@ -5,6 +5,7 @@ import at.if22b208.mtc.dto.user.UserCredentialsDto;
 import at.if22b208.mtc.dto.user.UserDataDto;
 import at.if22b208.mtc.entity.User;
 import at.if22b208.mtc.exception.HashingException;
+import at.if22b208.mtc.exception.NameNotValidException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Method;
@@ -65,7 +66,11 @@ public class UserController implements Controller {
         user.setName(dto.getName());
         user.setBiography(dto.getBiography());
         user.setImage(dto.getImage());
-        UserService.getInstance().updateUserData(user);
+        try {
+            UserService.getInstance().updateUserData(user);
+        } catch (NameNotValidException e) {
+            return ResponseUtils.conflict(MessageConstants.USER_UPDATE_FAILURE);
+        }
         return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.USER_UPDATED);
     }
 
@@ -81,7 +86,7 @@ public class UserController implements Controller {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
         }
 
-        UserDataDto dto = UserMapper.INSTANCE.map(user);
+        UserDataDto dto = UserMapper.INSTANCE.mapToUserDataDto(user);
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(dto));
     }
 
