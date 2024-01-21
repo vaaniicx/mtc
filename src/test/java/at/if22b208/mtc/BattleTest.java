@@ -33,6 +33,7 @@ class BattleTest {
     }
 
     @Test
+    @DisplayName("Test battle with expected to result in a draw")
     void test_battleWithDraw() {
         List<Card> deckA = new ArrayList<>();
         deckA.add(Card.builder().name("TestCard").cardType(CardType.MONSTER).cardElementType(CardElementType.NORMAL).damage(10).userUuid(playerA.getUuid()).build());
