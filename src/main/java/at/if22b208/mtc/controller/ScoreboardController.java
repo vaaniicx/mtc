@@ -28,7 +28,7 @@ public class ScoreboardController implements Controller {
         List<User> users = UserService.getInstance().getAll();
         List<UserStatsDto> dtos = users.stream()
                 .map(UserMapper.INSTANCE::mapToUserStatsDto)
-                .sorted(Comparator.comparing(UserStatsDto::elo))
+                .sorted(Comparator.comparing(UserStatsDto::elo).reversed())
                 .toList();
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtos.toArray()));
     }
