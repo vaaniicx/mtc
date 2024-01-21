@@ -51,7 +51,34 @@ public class User {
      * The list of cards in the user's deck.
      */
     private List<Card> deck;
+
+    /**
+     * The name of the user.
+     */
     private String name;
+
+    /**
+     * The biography of the user.
+     */
     private String biography;
+
+    /**
+     * The image of the user as a String.
+     */
     private String image;
+
+    /**
+     * The elo of the user.
+     */
+    private int elo;
+
+    /**
+     * The number of wins of the user.
+     */
+    private int wins;
+
+    /**
+     * The number of losses of the user.
+     */
+    private int losses;
 }
