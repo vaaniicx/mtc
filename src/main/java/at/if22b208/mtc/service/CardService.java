@@ -79,6 +79,15 @@ public class CardService implements Service<Card, UUID> {
                 .toList();
     }
 
+    public int getNextPackageId() {
+        Integer nextPackageId = CardRepository.getInstance().findNextPackageId();
+        if (nextPackageId == null) {
+            return 1;
+        } else {
+            return nextPackageId + 1;
+        }
+    }
+
     public List<Card> getPackage() throws InvalidPackageException {
         List<Card> cards = CardRepository.getInstance().findAvailablePackage()
                 .stream()

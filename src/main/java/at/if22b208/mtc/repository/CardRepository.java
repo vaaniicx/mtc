@@ -61,16 +61,16 @@ public class CardRepository implements Repository<Card, UUID> {
      */
     @Override
     public Card create(Card card) {
-        String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, name, damage, package_uuid, user_uuid)" +
+        String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, name, damage, package_id, user_uuid)" +
                 " VALUES (?, ?, ?, ?, ?)";
         val database = Database.getInstance();
         database.executeInsertQuery(query,
-                card.getUuid(), card.getName(), card.getDamage(), card.getPackageUuid(), card.getUserUuid());
+                card.getUuid(), card.getName(), card.getDamage(), card.getPackageId(), card.getUserUuid());
         return card;
     }
 
     public List<Optional<Card>> findByOwner(User user) {
-        String query = "SELECT uuid, name, damage, package_uuid, user_uuid FROM " + SCHEMA + TABLE +
+        String query = "SELECT uuid, name, damage, package_id, user_uuid FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid = ?";
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query, user.getUuid());
@@ -83,10 +83,10 @@ public class CardRepository implements Repository<Card, UUID> {
     }
 
     public List<Optional<Card>> findAvailablePackage() {
-        String packageQuery = "WITH random_package AS (SELECT DISTINCT package_uuid FROM " + SCHEMA + TABLE +
-                " WHERE user_uuid IS NULL LIMIT 1)";
-        String query = packageQuery + " " + "SELECT uuid, name, damage, package_uuid, user_uuid FROM " + SCHEMA + TABLE +
-                " WHERE package_uuid = (SELECT package_uuid FROM random_package) LIMIT 5";
+        String packageQuery = "WITH random_package AS (SELECT DISTINCT package_id FROM " + SCHEMA + TABLE +
+                " WHERE user_uuid IS NULL)";
+        String query = packageQuery + " " + "SELECT uuid, name, damage, package_id, user_uuid FROM " + SCHEMA + TABLE +
+                " WHERE package_id = (SELECT package_id FROM random_package ORDER BY package_id ASC LIMIT 1)";
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query);
 
@@ -101,6 +101,16 @@ public class CardRepository implements Repository<Card, UUID> {
         String query = "UPDATE " + SCHEMA + TABLE + " SET user_uuid = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getUuid(), card.getUuid());
+    }
+
+    public Integer findNextPackageId() {
+        String query = "SELECT MAX(package_id) as max FROM " + SCHEMA + TABLE;
+        val database = Database.getInstance();
+        Result result = database.executeSelectQuery(query);
+        for (Row row : result.getRows()) {
+            return row.getInt("max");
+        }
+        return null;
     }
 
     /**

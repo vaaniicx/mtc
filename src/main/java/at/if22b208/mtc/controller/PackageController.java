@@ -15,7 +15,6 @@ import at.if22b208.mtc.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 public class PackageController implements Controller {
@@ -34,14 +33,14 @@ public class PackageController implements Controller {
      * @return A response indicating the success or failure of the package creation.
      */
     private Response createPackage(List<CardDto> dtoList) {
-        UUID packageUuid = UUID.randomUUID();
+        int packageId = CardService.getInstance().getNextPackageId();
 
         for (CardDto dto : dtoList) {
             Card card = Card.builder()
                     .uuid(dto.uuid())
                     .name(dto.name())
                     .damage(dto.damage())
-                    .packageUuid(packageUuid)
+                    .packageId(packageId)
                     .build();
 
             try {

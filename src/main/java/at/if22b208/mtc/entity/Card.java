@@ -40,9 +40,9 @@ public class Card {
     private int damage;
 
     /**
-     * The UUID of the package to which the card belongs.
+     * The ID of the package to which the card belongs.
      */
-    private UUID packageUuid;
+    private int packageId;
 
     /**
      * The UUID of the user to whom the card is associated.
