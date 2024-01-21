@@ -14,6 +14,7 @@ import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class ScoreboardController implements Controller {
@@ -25,19 +26,21 @@ public class ScoreboardController implements Controller {
 
     private Response getScoreboard() {
         List<User> users = UserService.getInstance().getAll();
-        List<UserStatsDto> dtos = users.stream().map(UserMapper.INSTANCE::mapToUserStatsDto).toList();
+        List<UserStatsDto> dtos = users.stream()
+                .map(UserMapper.INSTANCE::mapToUserStatsDto)
+                .sorted(Comparator.comparing(UserStatsDto::elo))
+                .toList();
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtos.toArray()));
     }
 
     @Override
     public Response handleRequest(Request request) throws JsonProcessingException {
+        if (!SessionUtils.isAuthorized(request.getHeader())) {
+            return ResponseUtils.unauthorized();
+        }
+
         String root = request.getRoot();
-
         if (root.equalsIgnoreCase("scoreboard")) {
-            if (!SessionUtils.isAuthorized(request.getHeader())) {
-                return ResponseUtils.unauthorized();
-            }
-
             if (request.getMethod() == Method.GET) {
                 return this.getScoreboard();
             }
