@@ -9,6 +9,12 @@ public class BattleController implements Controller {
     private static BattleController INSTANCE;
 
     private BattleController() {
+        // hide constructor
+    }
+
+    @Override
+    public Response handleRequest(Request request) throws JsonProcessingException {
+        return null;
     }
 
     public static synchronized BattleController getInstance() {
@@ -16,10 +22,5 @@ public class BattleController implements Controller {
             INSTANCE = new BattleController();
         }
         return INSTANCE;
-    }
-
-    @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
-        return null;
     }
 }
