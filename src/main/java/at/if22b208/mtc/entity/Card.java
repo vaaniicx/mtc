@@ -7,7 +7,8 @@
  */
 package at.if22b208.mtc.entity;
 
-import at.if22b208.mtc.entity.enumeration.CardName;
+import at.if22b208.mtc.entity.enumeration.CardElementType;
+import at.if22b208.mtc.entity.enumeration.CardType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
@@ -30,7 +31,6 @@ public class Card {
 
     /**
      * The name of the card.
-     * See also {@link CardName}
      */
     private String name;
 
@@ -48,4 +48,24 @@ public class Card {
      * The UUID of the user to whom the card is associated.
      */
     private UUID userUuid;
+
+    /**
+     * The type of the card.
+     */
+    private CardType cardType;
+
+    /**
+     * The element type of the card.
+     */
+    private CardElementType cardElementType;
+
+    public static class CardBuilder {
+        public CardBuilder name(String name) {
+            this.name = name.toLowerCase();
+            this.cardType = this.name.contains("spell") ? CardType.SPELL : CardType.MONSTER;
+            this.cardElementType = this.name.contains("fire") ? CardElementType.FIRE : this.name.contains("water") ?
+                    CardElementType.WATER : CardElementType.NORMAL;
+            return this;
+        }
+    }
 }
