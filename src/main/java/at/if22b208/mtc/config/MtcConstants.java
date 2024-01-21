@@ -8,4 +8,5 @@ public class MtcConstants {
     }
 
     public static final BigInteger PACKAGE_COST = BigInteger.valueOf(5L);
+    public static final int MAX_ROUNDS_PER_BATTLE = 100;
 }
