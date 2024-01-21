@@ -9,6 +9,7 @@ public class MessageConstants {
     // GENERAL
     public static final String UNAUTHORIZED = "Access token is missing or invalid.";
     public static final String NOT_IMPLEMENTED = "Not implemented.";
+    public static final String BATTLE_DRAW = "Battle resulted in a draw. No winner could be determined.";
 
     // USER
     public static final String USER_CREATED = "User successfully created.";
