@@ -18,7 +18,15 @@ CREATE TABLE IF NOT EXISTS mtc.public.card
     uuid       uuid PRIMARY KEY NOT NULL,
     name       varchar          NOT NULL,
     damage     int4 default 0,
-    user_uuid  uuid,
+    user_uuid  uuid REFERENCES mtc.public.user (uuid),
     deck       bool default false,
     package_id int4             NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS mtc.public.trading_deal
+(
+    uuid        uuid PRIMARY KEY                       NOT NULL,
+    card_uuid   uuid REFERENCES mtc.public.card (uuid) NOT NULL,
+    card_type   varchar                                NOT NULL,
+    card_damage float8 default 0                       NOT NULL
 );
