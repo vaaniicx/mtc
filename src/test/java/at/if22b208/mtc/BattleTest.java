@@ -120,10 +120,10 @@ class BattleTest {
 
     private void preparePlayerDecks(String cardNameA, String cardNameB) {
         List<Card> deckA = new ArrayList<>();
-        deckA.add(Card.builder().name(cardNameA).damage(10).userUuid(playerA.getUuid()).build());
+        deckA.add(Card.builder().uuid(UUID.randomUUID()).name(cardNameA).damage(10).userUuid(playerA.getUuid()).build());
 
         List<Card> deckB = new ArrayList<>();
-        deckB.add(Card.builder().name(cardNameB).damage(20).userUuid(playerB.getUuid()).build());
+        deckB.add(Card.builder().uuid(UUID.randomUUID()).name(cardNameB).damage(20).userUuid(playerB.getUuid()).build());
 
         playerA.setDeck(deckA);
         playerB.setDeck(deckB);
