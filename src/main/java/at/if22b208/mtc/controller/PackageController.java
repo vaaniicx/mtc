@@ -12,6 +12,7 @@ import at.if22b208.mtc.service.CardService;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
+import at.if22b208.mtc.util.mapper.CardMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -36,12 +37,8 @@ public class PackageController implements Controller {
         int packageId = CardService.getInstance().getNextPackageId();
 
         for (CardDto dto : dtoList) {
-            Card card = Card.builder()
-                    .uuid(dto.uuid())
-                    .name(dto.name())
-                    .damage(dto.damage())
-                    .packageId(packageId)
-                    .build();
+            Card card = CardMapper.INSTANCE.map(dto);
+            card.setPackageId(packageId);
 
             try {
                 CardService.getInstance().create(card);
