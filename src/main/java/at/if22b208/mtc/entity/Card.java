@@ -59,6 +59,16 @@ public class Card {
      */
     private CardElementType cardElementType;
 
+    public Card makeCopy() {
+        return Card.builder()
+                .uuid(this.getUuid())
+                .name(this.getName())
+                .damage(this.getDamage())
+                .packageId(this.getPackageId())
+                .userUuid(this.getUserUuid())
+                .build();
+    }
+
     public static class CardBuilder {
         public CardBuilder name(String name) {
             this.name = name.toLowerCase();

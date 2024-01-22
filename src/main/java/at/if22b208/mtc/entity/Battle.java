@@ -32,8 +32,8 @@ public class Battle {
         SecureRandom random = new SecureRandom();
 
         for (int i = 1; i <= MtcConstants.MAX_ROUNDS_PER_BATTLE; i++) {
-            Card cardA = drawRandomCard(playerA.getDeck(), random);
-            Card cardB = drawRandomCard(playerB.getDeck(), random);
+            Card cardA = drawRandomCard(playerA.getDeck(), random).makeCopy();
+            Card cardB = drawRandomCard(playerB.getDeck(), random).makeCopy();
 
             // Logging information about the cards drawn
             log.info("Round " + i + ": PlayerA card - " + cardA);
