@@ -23,7 +23,7 @@ public class TradingDealMapperTest {
     @Test
     @DisplayName("Mapping empty TradingDealDto to TradingDeal")
     void test_mapEmptyTradingDealDtoToTradingDeal() {
-        TradingDealDto dealDto = TradingDealDto.builder().build();
+        TradingDealDto dealDto = new TradingDealDto();
         assertDoesNotThrow(() -> mapper.map(dealDto));
         assertionsOnMapping(dealDto, mapper.map(dealDto));
     }
@@ -31,12 +31,12 @@ public class TradingDealMapperTest {
     @Test
     @DisplayName("Mapping TradingDealDto to TradingDeal")
     void test_mapTradingDealDtoToTradingDeal() {
-        TradingDealDto dealDto = TradingDealDto.builder()
-                .uuid(UUID.randomUUID())
-                .cardUuid(UUID.randomUUID())
-                .cardType(CardType.MONSTER)
-                .minimumDamage(12.0)
-                .build();
+        TradingDealDto dealDto = new TradingDealDto();
+        dealDto.setUuid(UUID.randomUUID());
+        dealDto.setCardUuid(UUID.randomUUID());
+        dealDto.setCardType(CardType.MONSTER);
+        dealDto.setMinimumDamage(12.0);
+
         assertionsOnMapping(dealDto, mapper.map(dealDto));
     }
 

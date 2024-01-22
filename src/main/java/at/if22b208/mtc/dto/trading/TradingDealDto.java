@@ -2,13 +2,11 @@ package at.if22b208.mtc.dto.trading;
 
 import at.if22b208.mtc.entity.enumeration.CardType;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
 import java.util.UUID;
 
-@Builder
-@Getter
+@Data
 public class TradingDealDto {
     @JsonProperty("id")
     private UUID uuid;

@@ -27,7 +27,7 @@ class CardMapperTest {
     @Test
     @DisplayName("Mapping empty CardDto to Card")
     void test_mapEmptyCardDtoToCard() {
-        CardDto dto = CardDto.builder().build();
+        CardDto dto = new CardDto();
         assertDoesNotThrow(() -> mapper.map(dto));
         Card card = mapper.map(dto);
         assertionsOnMapping(dto, card);
@@ -41,6 +41,7 @@ class CardMapperTest {
                 .name("test")
                 .damage(10)
                 .build();
+
         CardDto dto = mapper.map(card);
         assertionsOnMapping(dto, card);
     }
@@ -48,11 +49,11 @@ class CardMapperTest {
     @Test
     @DisplayName("Mapping CardDto to Card")
     void test_mapCardDtoToCard() {
-        CardDto dto = CardDto.builder()
-                .uuid(UUID.randomUUID())
-                .name("test")
-                .damage(10)
-                .build();
+        CardDto dto = new CardDto();
+        dto.setUuid(UUID.randomUUID());
+        dto.setName("test");
+        dto.setDamage(10.0);
+
         Card card = mapper.map(dto);
         assertionsOnMapping(dto, card);
     }
