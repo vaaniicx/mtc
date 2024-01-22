@@ -13,7 +13,7 @@ Die Applikation besteht aus den Paketen `config`, `controller`, `database`, `dto
 >**service**: Hier befinden sich alle Service-Klassen. Stehen in direkter Verbindung und Austausch mit Repository-Klassen<br>
 >**util**: Verschiedene Utility-Klassen, die logisch zusammengelegte Funktionen zur Vereinfachung des restlichen Codes bieten<br>
 
-## Lessions learned
+## Lessons learned
 - Entwicklung wird enorm erleichtert durch
     - Klare Anforderungen
     - Klar definierte Testfälle/-Scripts
