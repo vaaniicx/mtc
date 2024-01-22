@@ -56,9 +56,9 @@ public class Battle {
 
             Round round = createRound(i);
 
-            handleMonsterFight(round, Card.copy(cardA), Card.copy(cardB));
-            handleSpellFight(round, Card.copy(cardA), Card.copy(cardB));
-            handleMixedFight(round, Card.copy(cardA), Card.copy(cardB));
+            handleMonsterFight(round, cardA , cardB);
+            handleSpellFight(round, cardA, cardB);
+            handleMixedFight(round, cardA, cardB);
 
             this.rounds.add(round);
             overtakeCard(round);
