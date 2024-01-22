@@ -3,8 +3,6 @@ package at.if22b208.mtc.util.balance;
 import at.if22b208.mtc.exception.NegativeBalanceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigInteger;
 
@@ -14,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Unit tests for the {@link BalanceOperation} implementations.
  * These tests cover the functionality of subtract and add operations.
  */
-@ExtendWith(MockitoExtension.class)
 class BalanceOperationTest {
 
     /**

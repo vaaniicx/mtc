@@ -5,8 +5,6 @@ import at.if22b208.mtc.dto.user.UserStatsDto;
 import at.if22b208.mtc.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Unit tests for the {@link UserMapper} implementations.
  * These tests cover the functionality of mapping between {@link User}, {@link UserDataDto} and {@link UserStatsDto}.
  */
-@ExtendWith(MockitoExtension.class)
 class UserMapperTest {
     private final UserMapper mapper = new UserMapperImpl();
 

@@ -5,8 +5,6 @@ import at.if22b208.mtc.entity.TradingDeal;
 import at.if22b208.mtc.entity.enumeration.CardType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
@@ -16,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Unit tests for the {@link TradingDealMapper} implementations.
  * These tests cover the functionality of mapping {@link TradingDealDto} to {@link TradingDeal}.
  */
-@ExtendWith(MockitoExtension.class)
 public class TradingDealMapperTest {
     private final TradingDealMapper mapper = new TradingDealMapperImpl();
 

@@ -4,14 +4,11 @@ import at.if22b208.mtc.dto.card.CardDto;
 import at.if22b208.mtc.entity.Card;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class CardMapperTest {
     private final CardMapper mapper = new CardMapperImpl();
 
