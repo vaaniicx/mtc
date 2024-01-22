@@ -29,7 +29,7 @@ Ich habe mich um ein eher fortgeschritteneres ELO-System entschieden.
 > **updateRatings-Methode**: Aktualisiert die Bewertungen von zwei Spielern basierend auf dem tatsächlichen Ergebnis eines Spiels. Es verwendet die erwarteten Ergebnisse und die tatsächlichen Ergebnisse, um neue Elo-Bewertungen für beide Spieler zu berechnen<br>
 
 ## Unit Test Design
-Folgende Test-Klassen wurden implementiert: `BalanceOperationTest`, `CardMapperTest`, `TradingDealMapperTest`, `UserMapperTest`, `BattleTest`. Diese wurden mithilfe der Frameworks `JUnit` und `Mockito` umgesetzt. In den Testklassen befinden sich insgesamt **20 Tests**.
+Folgende Test-Klassen wurden implementiert: `BalanceOperationTest`, `CardMapperTest`, `TradingDealMapperTest`, `UserMapperTest`, `BattleTest`. Diese wurden mithilfe der Frameworks `JUnit` und `Mockito` umgesetzt. In den Test-Klassen befinden sich insgesamt **20 Tests**.
 
 
 ## Time spent
