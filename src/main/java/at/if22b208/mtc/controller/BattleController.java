@@ -3,7 +3,6 @@ package at.if22b208.mtc.controller;
 import at.if22b208.mtc.config.MessageConstants;
 import at.if22b208.mtc.entity.Battle;
 import at.if22b208.mtc.entity.User;
-import at.if22b208.mtc.exception.BalanceTransactionException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Method;
@@ -11,14 +10,11 @@ import at.if22b208.mtc.server.http.Request;
 import at.if22b208.mtc.server.http.Response;
 import at.if22b208.mtc.service.BattleService;
 import at.if22b208.mtc.service.UserService;
+import at.if22b208.mtc.util.EloSystem;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
-import at.if22b208.mtc.util.balance.AddOperation;
-import at.if22b208.mtc.util.balance.SubtractOperation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigInteger;
 
 /**
  * Controller responsible for handling battle-related requests.
@@ -45,36 +41,29 @@ public class BattleController implements Controller {
                 return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.BATTLE_DRAW);
             }
 
-            if (battle.getWinner().getUuid() == battle.getPlayerA().getUuid()) {
-                updateUserStatisticData(battle.getPlayerA(), battle.getPlayerB());
-            } else {
-                updateUserStatisticData(battle.getPlayerB(), battle.getPlayerA());
-            }
+            User playerA = battle.getPlayerA();
+            User playerB = battle.getPlayerB();
+
+            // Calculate new ELO ratings
+            EloSystem.updateRatings(playerA, playerB, isPlayerAWon(battle));
+
+            // Persist new ELO ratings
+            updateUserStatisticData(playerA);
+            updateUserStatisticData(playerB);
 
             int roundsPlayed = battle.getRounds().size();
             return ResponseUtils.ok(ContentType.PLAIN_TEXT, "Rounds played: " + roundsPlayed + ", Winner is: " + battle.getWinner().getUsername());
         } catch (InterruptedException e) {
             return ResponseUtils.error(":D"); // Handle InterruptedException with an error response.
-        } catch (BalanceTransactionException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Updates the user statistics after a battle.
-     *
-     * @param winner The user who won the battle.
-     * @param loser  The user who lost the battle.
-     * @throws BalanceTransactionException If a balance transaction error occurs.
-     */
-    private static void updateUserStatisticData(User winner, User loser) throws BalanceTransactionException {
-        // Update winner data
-        UserService.getInstance().updateElo(winner, BigInteger.valueOf(3), new AddOperation());
-        UserService.getInstance().updateWin(winner, BigInteger.valueOf(1), new AddOperation());
+    private static boolean isPlayerAWon(Battle battle) {
+        return battle.getWinner().getUuid() == battle.getPlayerA().getUuid();
+    }
 
-        // Update loser data
-        UserService.getInstance().updateElo(loser, BigInteger.valueOf(5), new SubtractOperation());
-        UserService.getInstance().updateLoss(loser, BigInteger.valueOf(1), new AddOperation());
+    private static void updateUserStatisticData(User user) {
+        UserService.getInstance().updateElo(user);
     }
 
     /**

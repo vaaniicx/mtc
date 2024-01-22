@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS mtc.public.user
     name      varchar,
     biography varchar,
     image     varchar,
-    elo       int4 default 100,
+    elo       int4 default 1000,
     wins      int4 default 0,
     losses    int4 default 0
 );

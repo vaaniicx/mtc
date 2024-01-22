@@ -70,15 +70,8 @@ public class UserService implements Service<User, UUID> {
         }
     }
 
-    public void updateElo(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
-        try {
-            BigInteger newElo = operation.operate(BigInteger.valueOf(user.getElo()), amount);
-            user.setElo(newElo.intValue());
-            UserRepository.getInstance().updateElo(user);
-        } catch (NegativeBalanceException e) {
-            log.warn("Error occurred during elo update. No operation performed.", e);
-            throw new BalanceTransactionException("Error occurred during elo transaction. No operation performed.");
-        }
+    public void updateElo(User user) {
+        UserRepository.getInstance().updateElo(user);
     }
 
     public void updateLoss(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
