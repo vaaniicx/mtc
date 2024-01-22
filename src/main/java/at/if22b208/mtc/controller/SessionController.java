@@ -26,31 +26,32 @@ public class SessionController implements Controller {
     private static SessionController INSTANCE;
 
     private SessionController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**
      * Attempts to log in a user with the provided username and password.
      *
-     * @param dto The {@link UserCredentialsDto} containing username and password.
+     * @param credentialsDto The {@link UserCredentialsDto} containing username and password.
      * @return A {@link Response} object representing the result of the login attempt.
      */
-    private Response login(UserCredentialsDto dto) {
+    private Response login(UserCredentialsDto credentialsDto) {
         try {
             // Hash the provided password
-            String hash = HashingUtils.hash(dto.getPassword(), HashingUtils.generateSalt(dto.getUsername()));
+            String hash = HashingUtils.hash(credentialsDto.getPassword(), HashingUtils.generateSalt(credentialsDto.getUsername()));
             // Retrieve the user by username
-            User user = UserService.getInstance().getByUsername(dto.getUsername());
+            User user = UserService.getInstance().getByUsername(credentialsDto.getUsername());
             if (user != null) {
                 // Check if the user exists and if the provided username and password match
-                if (Objects.equals(user.getUsername(), dto.getUsername()) && Objects.equals(user.getPassword(), hash)) {
+                if (Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(user.getPassword(), hash)) {
                     // Successful login
                     String token = SessionManager.createSession(user.getUsername());
                     return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));
                 }
             }
         } catch (HashingException e) {
-            log.warn("Error during login for username '{}': {}", dto.getUsername(), e.getMessage());
+            // Log a warning in case of a hashing error
+            log.warn("Error during login for username '{}': {}", credentialsDto.getUsername(), e.getMessage());
         }
         // Unsuccessful login
         // Not exposing information about already existing accounts or whether username or password is not matching

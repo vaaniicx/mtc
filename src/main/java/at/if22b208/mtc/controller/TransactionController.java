@@ -31,7 +31,7 @@ public class TransactionController implements Controller {
     private static TransactionController INSTANCE;
 
     private TransactionController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**

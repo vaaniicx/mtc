@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Database class for managing PostgreSQL database interactions.
+ * Implements AutoCloseable to ensure proper resource management.
+ */
 @Slf4j
 @Getter
 public class Database implements AutoCloseable {
     private static Database INSTANCE;
-    // TODO: config file
     private static final String DB_USER = "postgres";
     private static final String DB_PASSWORD = "admin";
     private static final String DB_HOST = "localhost";
@@ -21,8 +24,12 @@ public class Database implements AutoCloseable {
     private Connection connection;
 
     private Database() {
+        // Private constructor to ensure singleton pattern.
     }
 
+    /**
+     * Connects to the PostgreSQL database using the specified credentials.
+     */
     public void connect() {
         String url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_SCHEMA + "?user=" + DB_USER +
                 "&password=" + DB_PASSWORD;
@@ -34,10 +41,21 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * Checks if the database is currently connected.
+     *
+     * @return True if connected, false otherwise.
+     */
     public boolean isConnected() {
         return this.connection != null;
     }
 
+    /**
+     * Executes an update SQL query.
+     *
+     * @param query  The SQL query to execute.
+     * @param params Parameters to be used in the query.
+     */
     public void executeUpdateQuery(String query, Object... params) {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (int i = 0; i < params.length; i++) {
@@ -49,6 +67,13 @@ public class Database implements AutoCloseable {
         }
     }
 
+    /**
+     * Executes an insert SQL query.
+     *
+     * @param query  The SQL query to execute.
+     * @param params Parameters to be used in the query.
+     * @return The UUID of the inserted row.
+     */
     public UUID executeInsertQuery(String query, Object... params) {
         try (PreparedStatement statement = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
@@ -73,6 +98,13 @@ public class Database implements AutoCloseable {
         return null;
     }
 
+    /**
+     * Executes a select SQL query and returns the result.
+     *
+     * @param query  The SQL query to execute.
+     * @param params Parameters to be used in the query.
+     * @return The result of the select query.
+     */
     public Result executeSelectQuery(String query, Object... params) {
         Result result = Result.builder().build();
 
@@ -102,13 +134,9 @@ public class Database implements AutoCloseable {
         return result;
     }
 
-    public static synchronized Database getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Database();
-        }
-        return INSTANCE;
-    }
-
+    /**
+     * Closes the database connection.
+     */
     @Override
     public void close() {
         if (connection != null) {
@@ -118,5 +146,17 @@ public class Database implements AutoCloseable {
                 log.error(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Gets the singleton instance of the {@code Database}.
+     *
+     * @return The singleton instance of the {@code Database}.
+     */
+    public static synchronized Database getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Database();
+        }
+        return INSTANCE;
     }
 }

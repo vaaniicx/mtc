@@ -16,15 +16,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * The {@code UserRepository} class is responsible for handling database operations related to users.
+ *
+ * <p>This repository provides methods for finding, creating, and updating user data in the database.</p>
+ *
+ * @see Repository
+ * @see User
+ */
 @Slf4j
 public class UserRepository implements Repository<User, UUID> {
     private static UserRepository INSTANCE;
     private static final String TABLE = "user";
 
     private UserRepository() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
+    /**
+     * Retrieves all users from the database.
+     *
+     * @return A list of all users in the database.
+     */
     public List<Optional<User>> findAll() {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses FROM " + SCHEMA + TABLE;
         val database = Database.getInstance();
@@ -37,6 +50,12 @@ public class UserRepository implements Repository<User, UUID> {
         return users;
     }
 
+    /**
+     * Finds a user by their UUID in the database.
+     *
+     * @param uuid The UUID of the user to find.
+     * @return An Optional containing the found user, or an empty Optional if not found.
+     */
     @Override
     public Optional<User> findById(UUID uuid) {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses " +
@@ -50,6 +69,12 @@ public class UserRepository implements Repository<User, UUID> {
         return Optional.empty();
     }
 
+    /**
+     * Finds a user by their username in the database.
+     *
+     * @param username The username of the user to find.
+     * @return An Optional containing the found user, or an empty Optional if not found.
+     */
     public Optional<User> findByUsername(String username) {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses FROM "
                 + SCHEMA + TABLE + " WHERE username = ?";
@@ -63,6 +88,12 @@ public class UserRepository implements Repository<User, UUID> {
         return user;
     }
 
+    /**
+     * Creates a new user in the database.
+     *
+     * @param user The user to be created.
+     * @return The created user with its UUID set.
+     */
     @Override
     public User create(User user) {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, username, password, balance) VALUES " +
@@ -72,6 +103,11 @@ public class UserRepository implements Repository<User, UUID> {
         return user.withUuid(uuid);
     }
 
+    /**
+     * Updates user data (name, biography, image) in the database.
+     *
+     * @param user The user whose data needs to be updated.
+     */
     public void updateUserData(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET name = ?, biography = ?, image = ? WHERE uuid = ?";
         val database = Database.getInstance();
@@ -89,24 +125,44 @@ public class UserRepository implements Repository<User, UUID> {
         database.executeUpdateQuery(query, user.getBalance(), user.getUuid());
     }
 
+    /**
+     * Updates the ELO rating of the user in the database.
+     *
+     * @param user The user whose ELO rating needs to be updated.
+     */
     public void updateElo(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET elo = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getElo(), user.getUuid());
     }
 
+    /**
+     * Updates the losses count of the user in the database.
+     *
+     * @param user The user whose losses count needs to be updated.
+     */
     public void updateLoss(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET losses = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getLosses(), user.getUuid());
     }
 
+    /**
+     * Updates the wins count of the user in the database.
+     *
+     * @param user The user whose wins count needs to be updated.
+     */
     public void updateWin(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET wins = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getWins(), user.getUuid());
     }
 
+    /**
+     * Updates the deck of the user in the database.
+     *
+     * @param user The user whose deck needs to be updated.
+     */
     public void updateDeck(User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET deck = ? WHERE uuid = ?";
         val database = Database.getInstance();
@@ -114,6 +170,12 @@ public class UserRepository implements Repository<User, UUID> {
                 JsonUtils.getJsonStringFromArray(user.getDeck().stream().map(Card::getUuid).toArray()), user.getUuid());
     }
 
+    /**
+     * Builds a User entity from a database row.
+     *
+     * @param row The database row containing user data.
+     * @return A User entity built from the database row.
+     */
     private User buildUserFromRow(Row row) {
         return User.builder()
                 .uuid(row.getUuid("uuid"))

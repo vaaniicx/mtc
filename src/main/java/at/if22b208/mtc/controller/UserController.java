@@ -27,7 +27,7 @@ public class UserController implements Controller {
     private static UserController INSTANCE;
 
     private UserController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**
@@ -90,6 +90,13 @@ public class UserController implements Controller {
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(dto));
     }
 
+    /**
+     * Handles incoming HTTP requests related to user operations.
+     * Validates the user's authorization and processes requests for user creation, retrieval, and updates.
+     *
+     * @param request The incoming HTTP request to be handled.
+     * @return A response indicating the result of processing the request.
+     */
     @Override
     public Response handleRequest(Request request) {
         String root = request.getRoot();
@@ -105,7 +112,6 @@ public class UserController implements Controller {
                         }
                         return this.createUserWithCredentials(dto);
                     } catch (HashingException e) {
-                        // TODO: Clean up
                         log.warn(e.getMessage());
                     }
                 }

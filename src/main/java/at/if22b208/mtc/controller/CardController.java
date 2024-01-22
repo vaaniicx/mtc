@@ -23,42 +23,51 @@ public class CardController implements Controller {
     private static CardController INSTANCE;
 
     private CardController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**
      * Retrieves a list of cards associated with the specified username.
      *
-     * @param username The username of the user for whom to retrieve cards.
+     * @param user The user for whom to retrieve cards.
      * @return Response containing the list of cards in JSON format.
      */
-    private Response getCards(String username) {
-        User user = UserService.getInstance().getByUsername(username);
+    private Response getCards(User user) {
+        List<Card> cards = CardService.getInstance().getAllByOwner(user);
 
-        if (user != null) {
-            List<Card> cards = CardService.getInstance().getAllByOwner(user);
-
-            if (cards.isEmpty()) {
-                return ResponseUtils.noContent(MessageConstants.USER_NO_CARDS);
-            }
-            return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(cards.toArray()));
-        } else {
-            return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
+        if (cards.isEmpty()) {
+            // Return a response with no content and a message indicating no cards found.
+            return ResponseUtils.noContent(MessageConstants.USER_NO_CARDS);
         }
+        // Return a response with JSON content containing the list of cards.
+        return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(cards.toArray()));
     }
 
+    /**
+     * Handles the incoming HTTP request for card-related operations.
+     *
+     * @param request The incoming HTTP request.
+     * @return Response indicating the outcome of the request.
+     */
     @Override
     public Response handleRequest(Request request) {
+        // Check if the request is authorized
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }
 
         // Retrieve the username from the user session
         String username = SessionUtils.getUsernameFromHeader(request.getHeader());
+        User user = UserService.getInstance().getByUsername(username);
+        // Check if the user is not found
+        if (user == null) {
+            return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
+        }
 
         String root = request.getRoot();
         if ("cards".equals(root) && request.getMethod() == Method.GET) {
-            return this.getCards(username);
+            // Handle GET request for retrieving cards
+            return this.getCards(user);
         }
         return ResponseUtils.notImplemented();
     }

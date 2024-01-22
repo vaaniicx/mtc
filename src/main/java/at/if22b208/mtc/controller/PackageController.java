@@ -17,12 +17,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+/**
+ * Controller class for handling card package-related operations.
+ */
 @Slf4j
 public class PackageController implements Controller {
     private static PackageController INSTANCE;
 
     private PackageController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**
@@ -30,19 +33,21 @@ public class PackageController implements Controller {
      * Each card in the list is converted to an entity and associated with the generated package UUID.
      * If a card with the same UUID already exists in the database, a conflict response is returned.
      *
-     * @param dtoList The list of card DTOs to be included in the package.
+     * @param cardDtoList The list of card DTOs to be included in the package.
      * @return A response indicating the success or failure of the package creation.
      */
-    private Response createPackage(List<CardDto> dtoList) {
+    private Response createPackage(List<CardDto> cardDtoList) {
         int packageId = CardService.getInstance().getNextPackageId();
 
-        for (CardDto dto : dtoList) {
+        for (CardDto dto : cardDtoList) {
             Card card = CardMapper.INSTANCE.map(dto);
             card.setPackageId(packageId);
 
             try {
                 CardService.getInstance().create(card);
             } catch (InvalidPackageException e) {
+                // Log the exception and return a conflict response.
+                log.error("Error creating card package: {}", e.getMessage());
                 return ResponseUtils.conflict(MessageConstants.PACKAGE_CARD_ALREADY_EXISTS);
             }
         }
@@ -58,10 +63,12 @@ public class PackageController implements Controller {
      */
     @Override
     public Response handleRequest(Request request) {
+        // Check if the request is authorized
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }
 
+        // Validate admin privileges
         String token = SessionUtils.getBearerToken(request.getHeader());
         if (token == null || !token.startsWith("admin")) {
             return ResponseUtils.forbidden(MessageConstants.INSUFFICIENT_PRIVILEGE);
@@ -77,7 +84,7 @@ public class PackageController implements Controller {
                 }
             }
         }
-        return null;
+        return ResponseUtils.notImplemented();
     }
 
     /**

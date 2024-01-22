@@ -6,13 +6,17 @@ import at.if22b208.mtc.server.Server;
 import at.if22b208.mtc.server.util.Router;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * The main class for the Monster Trading Cards application.
+ * Initializes the database connection and starts the REST server.
+ */
 @Slf4j
 public class MonsterTradingCardsApplication {
 
     /**
      * Starts the REST-Server listening on port 10001
      *
-     * @param args args
+     * @param args The command-line arguments.
      */
     public static void main(String[] args) {
         Database.getInstance().connect();
@@ -25,6 +29,11 @@ public class MonsterTradingCardsApplication {
         server.start();
     }
 
+    /**
+     * Configures the router by adding controllers for different endpoints.
+     *
+     * @return The configured router.
+     */
     private static Router configureRouter() {
         Router router = new Router();
         router.addController("/users", UserController.getInstance());

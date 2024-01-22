@@ -2,12 +2,14 @@ package at.if22b208.mtc.controller;
 
 import at.if22b208.mtc.config.MessageConstants;
 import at.if22b208.mtc.entity.Card;
+import at.if22b208.mtc.entity.TradingDeal;
 import at.if22b208.mtc.entity.User;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Request;
 import at.if22b208.mtc.server.http.Response;
 import at.if22b208.mtc.service.CardService;
+import at.if22b208.mtc.service.TradingDealService;
 import at.if22b208.mtc.service.UserService;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
@@ -26,7 +28,7 @@ public class DeckController implements Controller {
     private static DeckController INSTANCE;
 
     private DeckController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**
@@ -48,10 +50,12 @@ public class DeckController implements Controller {
         }
 
         if ("format=plain".equalsIgnoreCase(type)) {
+            // Return the deck in plain text format
             StringBuilder b = new StringBuilder();
             deck.forEach(b::append);
             return ResponseUtils.ok(ContentType.PLAIN_TEXT, b.toString());
         }
+        // Return the deck in JSON format
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(deck.toArray()));
     }
 
@@ -68,7 +72,7 @@ public class DeckController implements Controller {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
         }
 
-        // TODO: remove null check, make it nullsafe
+        // Check for null or incorrect number of cards
         if (uuids == null || new HashSet<>(uuids).size() != 4) {
             return ResponseUtils.badRequest(MessageConstants.CONFIGURE_DECK_FAILURE);
         }
@@ -78,16 +82,33 @@ public class DeckController implements Controller {
                 .map(Card::getUuid)
                 .collect(Collectors.toUnmodifiableSet());
 
-        if (ownedCards.containsAll(uuids)) {
+        if (ownedCards.containsAll(uuids) && !hasCardLockedInTradingDeal(uuids)) {
+            // Set the user's deck with the specified card UUIDs
             user.setDeck(uuids.stream().map(CardService.getInstance()::getById).toList());
             UserService.getInstance().updateDeck(user);
             return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.CONFIGURE_DECK);
         }
+        // Return a conflict response if any of the specified cards are not owned by the user or locked in a trading deal
         return ResponseUtils.conflict(MessageConstants.CONFIGURE_DECK_CARD_UNAVAILABLE);
+    }
+
+    /**
+     * Checks if any of the specified cards are locked in an active trading deal.
+     *
+     * @param uuids List of UUIDs representing the cards to check.
+     * @return True if any of the cards are locked in a trading deal; otherwise, false.
+     */
+    private boolean hasCardLockedInTradingDeal(List<UUID> uuids) {
+        List<TradingDeal> deals = TradingDealService.getInstance().getAll();
+        return deals.stream()
+                .map(TradingDeal::getCardUuid)
+                .toList().stream()
+                .anyMatch(uuids::contains);
     }
 
     @Override
     public Response handleRequest(Request request) {
+        // Check if the request is authorized
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }

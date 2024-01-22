@@ -10,6 +10,27 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+/**
+ * The {@code HashingUtils} class provides utility methods for hashing and generating salts.
+ * It uses the PBKDF2 algorithm with HMAC SHA-256 for password hashing.
+ * <p>
+ * Note: This class is a simplified example for educational purposes. In a production environment,
+ * it's recommended to use a secure hashing algorithm like BCrypt and store the salt securely (and randomize it).
+ * </p>
+ * <p>
+ * Usage:
+ * </p>
+ * <pre>
+ * {@code
+ * try {
+ *     String hashedPassword = HashingUtils.hash("password", "user_salt");
+ *     String salt = HashingUtils.generateSalt("username");
+ * } catch (HashingException e) {
+ *     // Handle the exception
+ * }
+ * }
+ * </pre>
+ */
 @Slf4j
 public class HashingUtils {
     private static final String ALGORITHM = "PBKDF2WithHmacSHA1";
@@ -18,7 +39,9 @@ public class HashingUtils {
      * Hashes the provided plain text using PBKDF2 with HMAC SHA-256.
      *
      * @param plain The plain text to be hashed.
+     * @param salt  The salt used for hashing.
      * @return The hashed value as a Base64-encoded string.
+     * @throws HashingException If an error occurs during the hashing process.
      */
     public static String hash(String plain, String salt) throws HashingException {
         try {
@@ -39,9 +62,6 @@ public class HashingUtils {
      *
      * <p>This method is intended to generate a unique salt for each user without storing it in the database.
      * It concatenates the username with a constant string to create the salt.</p>
-     *
-     * <p>Note: In a production environment, it's recommended to use a secure hashing algorithm like BCrypt
-     * and store the salt securely (and randomize it). This simplified example is for educational purposes only.</p>
      *
      * @param username The username for which the salt is generated.
      * @return A salt string for password hashing.

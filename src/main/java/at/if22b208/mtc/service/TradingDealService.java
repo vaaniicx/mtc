@@ -12,7 +12,7 @@ public class TradingDealService implements Service<TradingDeal, UUID> {
     private static TradingDealService INSTANCE;
 
     private TradingDealService() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     @Override

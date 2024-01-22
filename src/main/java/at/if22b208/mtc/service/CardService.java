@@ -12,14 +12,9 @@ import java.util.UUID;
 
 /**
  * The {@code CardService} class provides business logic and services related to the {@link Card} entity.
- * It acts as an intermediary between the {@link CardRepository} and the application controllers,
- * handling operations such as card creation, retrieval, and validation.
- * <p>
- * This class follows the singleton pattern with a synchronized instance retrieval method.
- * </p>
  *
- * @author Vanessa Kausl
- * @since 2023-01-01
+ * <p> It acts as an intermediary between the {@link CardRepository} and the application controllers,
+ * handling operations such as card creation, retrieval, and validation.
  */
 @Slf4j
 public class CardService implements Service<Card, UUID> {
@@ -39,6 +34,7 @@ public class CardService implements Service<Card, UUID> {
      *
      * @param card The card entity to be created.
      * @return The created card, or {@code null} if a card with the same UUID already exists.
+     * @throws InvalidPackageException If the card already exists.
      */
     @Override
     public Card create(Card card) throws InvalidPackageException {
@@ -71,6 +67,12 @@ public class CardService implements Service<Card, UUID> {
                 .orElse(null);
     }
 
+    /**
+     * Retrieves a list of all cards owned by a specific user.
+     *
+     * @param user The user whose cards need to be retrieved.
+     * @return A list of cards owned by the specified user.
+     */
     public List<Card> getAllByOwner(User user) {
         return CardRepository.getInstance()
                 .findByOwner(user)
@@ -79,6 +81,11 @@ public class CardService implements Service<Card, UUID> {
                 .toList();
     }
 
+    /**
+     * Gets the next available package ID.
+     *
+     * @return The next available package ID.
+     */
     public int getNextPackageId() {
         Integer nextPackageId = CardRepository.getInstance().findNextPackageId();
         if (nextPackageId == null) {
@@ -88,6 +95,12 @@ public class CardService implements Service<Card, UUID> {
         }
     }
 
+    /**
+     * Retrieves a package of cards with the required size (currently set to 5 cards).
+     *
+     * @return A list of cards representing the package.
+     * @throws InvalidPackageException If the package size is not as expected.
+     */
     public List<Card> getPackage() throws InvalidPackageException {
         List<Card> cards = CardRepository.getInstance().findAvailablePackage()
                 .stream()
@@ -101,6 +114,12 @@ public class CardService implements Service<Card, UUID> {
         return cards;
     }
 
+    /**
+     * Updates the owner of a card to a new user.
+     *
+     * @param card The card whose owner needs to be updated.
+     * @param user The new owner of the card.
+     */
     public void updateOwner(Card card, User user) {
         CardRepository.getInstance().updateOwner(card, user);
     }

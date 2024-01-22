@@ -50,12 +50,12 @@ public class Card {
     private UUID userUuid;
 
     /**
-     * The type of the card.
+     * The type of the card (e.g., Spell or Monster).
      */
     private CardType cardType;
 
     /**
-     * The element type of the card.
+     * The element type of the card (e.g., Fire, Water, or Normal).
      */
     private CardElementType cardElementType;
 
@@ -77,7 +77,16 @@ public class Card {
                 .build();
     }
 
+    /**
+     * Builder class for {@code Card}, providing a name transformation based on certain keywords.
+     */
     public static class CardBuilder {
+        /**
+         * Sets the name of the card and determines its type and element based on keywords.
+         *
+         * @param name The name of the card.
+         * @return The modified builder instance.
+         */
         public CardBuilder name(String name) {
             this.name = name.toLowerCase();
             this.cardType = this.name.contains("spell") ? CardType.SPELL : CardType.MONSTER;

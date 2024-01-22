@@ -8,6 +8,9 @@ import lombok.With;
 
 import java.util.UUID;
 
+/**
+ * Represents a trading deal, specifying the conditions for trading a card.
+ */
 @Builder
 @ToString
 @Data

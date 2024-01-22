@@ -69,6 +69,12 @@ public class CardRepository implements Repository<Card, UUID> {
         return card;
     }
 
+    /**
+     * Finds all cards owned by a specific user.
+     *
+     * @param user The user for whom to retrieve owned cards.
+     * @return A list of Optional cards owned by the user.
+     */
     public List<Optional<Card>> findByOwner(User user) {
         String query = "SELECT uuid, name, damage, package_id, user_uuid FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid = ?";
@@ -82,6 +88,11 @@ public class CardRepository implements Repository<Card, UUID> {
         return cards;
     }
 
+    /**
+     * Finds available cards in a package.
+     *
+     * @return A list of Optional cards available in a package.
+     */
     public List<Optional<Card>> findAvailablePackage() {
         String packageQuery = "WITH random_package AS (SELECT DISTINCT package_id FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid IS NULL)";
@@ -97,12 +108,23 @@ public class CardRepository implements Repository<Card, UUID> {
         return cards;
     }
 
+    /**
+     * Updates the owner of a specific card.
+     *
+     * @param card The card to be updated.
+     * @param user The new owner of the card.
+     */
     public void updateOwner(Card card, User user) {
         String query = "UPDATE " + SCHEMA + TABLE + " SET user_uuid = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getUuid(), card.getUuid());
     }
 
+    /**
+     * Finds the maximum package ID currently in use.
+     *
+     * @return The maximum package ID or null if no packages exist.
+     */
     public Integer findNextPackageId() {
         String query = "SELECT MAX(package_id) as max FROM " + SCHEMA + TABLE;
         val database = Database.getInstance();
@@ -130,9 +152,9 @@ public class CardRepository implements Repository<Card, UUID> {
     }
 
     /**
-     * Gets a singleton instance of the CardRepository.
+     * Gets a singleton instance of the {@code CardRepository}.
      *
-     * @return The singleton instance of the CardRepository.
+     * @return The singleton instance of the {@code CardRepository}.
      */
     public static synchronized CardRepository getInstance() {
         if (INSTANCE == null) {

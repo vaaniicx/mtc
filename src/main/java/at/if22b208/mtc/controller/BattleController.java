@@ -16,16 +16,27 @@ import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.balance.AddOperation;
 import at.if22b208.mtc.util.balance.SubtractOperation;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
 
+/**
+ * Controller responsible for handling battle-related requests.
+ */
+@Slf4j
 public class BattleController implements Controller {
     private static BattleController INSTANCE;
 
     private BattleController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
+    /**
+     * Handles the request to wait for a battle to be ready.
+     *
+     * @param user The user waiting for the battle.
+     * @return Response indicating the outcome of the battle.
+     */
     private Response waitForBattleToBeReady(User user) {
         try {
             Battle battle = BattleService.getInstance().enterBattleQueue(user);
@@ -43,12 +54,19 @@ public class BattleController implements Controller {
             int roundsPlayed = battle.getRounds().size();
             return ResponseUtils.ok(ContentType.PLAIN_TEXT, "Rounds played: " + roundsPlayed + ", Winner is: " + battle.getWinner().getUsername());
         } catch (InterruptedException e) {
-            return ResponseUtils.error(":D");
+            return ResponseUtils.error(":D"); // Handle InterruptedException with an error response.
         } catch (BalanceTransactionException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Updates the user statistics after a battle.
+     *
+     * @param winner The user who won the battle.
+     * @param loser  The user who lost the battle.
+     * @throws BalanceTransactionException If a balance transaction error occurs.
+     */
     private static void updateUserStatisticData(User winner, User loser) throws BalanceTransactionException {
         // Update winner data
         UserService.getInstance().updateElo(winner, BigInteger.valueOf(3), new AddOperation());
@@ -59,6 +77,13 @@ public class BattleController implements Controller {
         UserService.getInstance().updateLoss(loser, BigInteger.valueOf(1), new AddOperation());
     }
 
+    /**
+     * Handles the incoming HTTP request for battles.
+     *
+     * @param request The incoming HTTP request.
+     * @return Response indicating the outcome of the request.
+     * @throws JsonProcessingException If JSON processing error occurs.
+     */
     @Override
     public Response handleRequest(Request request) throws JsonProcessingException {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
@@ -77,6 +102,11 @@ public class BattleController implements Controller {
         return ResponseUtils.notImplemented();
     }
 
+    /**
+     * Gets the singleton instance of the BattleController.
+     *
+     * @return The instance of the BattleController.
+     */
     public static synchronized BattleController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new BattleController();

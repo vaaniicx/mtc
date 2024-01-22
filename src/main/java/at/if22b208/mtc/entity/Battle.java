@@ -16,6 +16,13 @@ import java.util.stream.IntStream;
 
 /**
  * Represents a battle between two players with decks of cards.
+ * The battle involves a series of rounds, each consisting of card draws,
+ * special interactions, and winner determination. The battle continues until
+ * a winner is determined or the maximum number of rounds is reached.
+ * <p>
+ * This class encapsulates the logic for handling various aspects of the battle,
+ * including interactions between different types of cards (monsters, spells),
+ * determining the winner based on drawn cards, and updating player decks.
  */
 @Data
 @Slf4j

@@ -20,7 +20,7 @@ public class UserService implements Service<User, UUID> {
     private static UserService INSTANCE;
 
     private UserService() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     public List<User> getAll() {

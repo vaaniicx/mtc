@@ -22,9 +22,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Controller class for handling trading deals.
+ */
 public class TradingController implements Controller {
     private static TradingController INSTANCE;
 
+    /**
+     * Retrieves all trading deals from the system.
+     *
+     * @return A response containing a list of trading deals in JSON format, or a no-content response if no deals are available.
+     */
     private Response getTradingDeals() {
         List<TradingDeal> deals = TradingDealService.getInstance().getAll();
         if (!deals.isEmpty()) {
@@ -33,6 +41,14 @@ public class TradingController implements Controller {
         return ResponseUtils.noContent(MessageConstants.NO_TRADING_DEALS);
     }
 
+    /**
+     * Creates a new trading deal based on the provided data transfer object (DTO).
+     * Validates the ownership and status of the trading card before creating the deal.
+     *
+     * @param user The user initiating the trading deal.
+     * @param dto  The trading deal data transfer object.
+     * @return A response indicating the success or failure of the trading deal creation.
+     */
     private Response createTradingDeal(User user, TradingDealDto dto) {
         Card tradingCard = CardService.getInstance().getById(dto.getCardUuid());
 
@@ -49,6 +65,14 @@ public class TradingController implements Controller {
         return ResponseUtils.created(MessageConstants.TRADING_DEAL_CREATE);
     }
 
+    /**
+     * Deletes a trading deal initiated by the user.
+     * Validates the ownership of the trading card associated with the deal.
+     *
+     * @param user    The user initiating the deletion.
+     * @param dealUuid The UUID of the trading deal to be deleted.
+     * @return A response indicating the success or failure of the trading deal deletion.
+     */
     private Response deleteTradingDeal(User user, UUID dealUuid) {
         TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
         if (deal == null) {
@@ -66,6 +90,15 @@ public class TradingController implements Controller {
         return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.TRADING_DEAL_DELETE);
     }
 
+    /**
+     * Carries out a trading deal by transferring ownership of cards between users.
+     * Validates the ownership and trading requirements before completing the deal.
+     *
+     * @param user    The user initiating the deal.
+     * @param dealUuid The UUID of the trading deal to be carried out.
+     * @param cardUuid The UUID of the card offered by the user to complete the deal.
+     * @return A response indicating the success or failure of carrying out the trading deal.
+     */
     private Response carryOutDeal(User user, UUID dealUuid, UUID cardUuid) {
         TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
         if (deal == null) {
@@ -90,25 +123,61 @@ public class TradingController implements Controller {
         return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.TRADING_DEAL_CREATE);
     }
 
+    /**
+     * Checks if the user owns the specified card.
+     *
+     * @param user The user to check ownership for.
+     * @param card The card to check ownership of.
+     * @return True if the user owns the card, false otherwise.
+     */
     private boolean hasCardOwned(User user, Card card) {
         return card.getUserUuid().equals(user.getUuid());
     }
 
+    /**
+     * Checks if the user's deck contains the specified card.
+     *
+     * @param user The user to check the deck for.
+     * @param card The card to check if it is in the deck.
+     * @return True if the card is in the user's deck, false otherwise.
+     */
     private boolean hasCardLocked(User user, Card card) {
         return user.getDeck().stream()
                 .anyMatch(c -> c.getUuid().equals(card.getUuid()));
     }
 
+    /**
+     * Checks if the card meets the trading requirements specified in the deal.
+     *
+     * @param deal         The trading deal containing the requirements.
+     * @param offeredCard The card offered by the user.
+     * @return True if the card meets the trading requirements, false otherwise.
+     */
     private boolean hasTradingRequirements(TradingDeal deal, Card offeredCard) {
         return deal.getCardType().equals(offeredCard.getCardType())
                 && deal.getMinimumDamage() <= offeredCard.getDamage();
     }
 
+    /**
+     * Checks if the specified user is the owner of the card associated with the trading deal.
+     *
+     * @param user The user to check against.
+     * @param deal The trading deal containing the card UUID.
+     * @return True if the user is the owner, false otherwise.
+     */
     private boolean isUserFromDeal(User user, TradingDeal deal) {
         return user.getUuid().equals(CardService.getInstance().getById(deal.getCardUuid())
                         .getUserUuid());
     }
 
+    /**
+     * Handles incoming HTTP requests related to trading deals.
+     * Validates the user's authorization and processes requests for trading deals.
+     *
+     * @param request The incoming HTTP request to be handled.
+     * @return A response indicating the result of processing the request.
+     * @throws JsonProcessingException If there is an error processing JSON data.
+     */
     @Override
     public Response handleRequest(Request request) throws JsonProcessingException {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
@@ -157,6 +226,11 @@ public class TradingController implements Controller {
         return ResponseUtils.notImplemented();
     }
 
+    /**
+     * Gets the singleton instance of the {@code TradingController}.
+     *
+     * @return The singleton instance of the {@code TradingController}.
+     */
     public static synchronized TradingController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TradingController();

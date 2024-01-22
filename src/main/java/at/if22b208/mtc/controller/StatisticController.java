@@ -14,24 +14,41 @@ import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+/**
+ * Controller class for handling user statistics.
+ */
 public class StatisticController implements Controller {
     private static StatisticController INSTANCE;
 
     private StatisticController() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
+    /**
+     * Retrieves user statistics for the specified username.
+     *
+     * @param username The username for which to retrieve statistics.
+     * @return Response containing user statistics in JSON format.
+     */
     private Response getStats(String username) {
         User user = UserService.getInstance().getByUsername(username);
         UserStatsDto dto = UserMapper.INSTANCE.mapToUserStatsDto(user);
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(dto));
     }
 
+    /**
+     * Handles incoming HTTP requests related to user statistics.
+     *
+     * @param request The incoming HTTP request to be handled.
+     * @return A response indicating the result of processing the request.
+     * @throws JsonProcessingException if there is an issue processing JSON.
+     */
     @Override
     public Response handleRequest(Request request) throws JsonProcessingException {
         String root = request.getRoot();
 
         if (root.equalsIgnoreCase("stats")) {
+            // Check if the request is authorized
             if (!SessionUtils.isAuthorized(request.getHeader())) {
                 return ResponseUtils.unauthorized();
             }

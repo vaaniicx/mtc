@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public class MtcConstants {
     private MtcConstants() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     public static final BigInteger PACKAGE_COST = BigInteger.valueOf(5L);

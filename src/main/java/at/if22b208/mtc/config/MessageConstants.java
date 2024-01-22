@@ -3,7 +3,7 @@ package at.if22b208.mtc.config;
 public class MessageConstants {
 
     private MessageConstants() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     // GENERAL

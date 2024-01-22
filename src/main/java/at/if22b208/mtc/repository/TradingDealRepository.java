@@ -12,12 +12,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * The {@code TradingDealRepository} class is responsible for handling database operations related to trading deals.
+ *
+ * <p>This repository provides methods for finding, creating, and deleting trading deals from the database.</p>
+ *
+ * @see Repository
+ * @see TradingDeal
+ */
 public class TradingDealRepository implements Repository<TradingDeal, UUID> {
     private static TradingDealRepository INSTANCE;
     private static final String TABLE = "trading_deal";
 
     private TradingDealRepository() {
-        // hide constructor
+        // Private constructor to ensure singleton pattern.
     }
 
     /**
@@ -38,6 +46,12 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
         return deals;
     }
 
+    /**
+     * Finds a trading deal by its UUID in the database.
+     *
+     * @param uuid The UUID of the trading deal to find.
+     * @return An Optional containing the found trading deal, or an empty Optional if not found.
+     */
     @Override
     public Optional<TradingDeal> findById(UUID uuid) {
         String query = "SELECT uuid, card_uuid, card_type, card_damage FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
@@ -50,6 +64,12 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
         return Optional.empty();
     }
 
+    /**
+     * Creates a new trading deal in the database.
+     *
+     * @param deal The trading deal to be created.
+     * @return The created trading deal.
+     */
     @Override
     public TradingDeal create(TradingDeal deal) {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, card_uuid, card_type, card_damage)" +
@@ -60,12 +80,23 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
         return deal;
     }
 
+    /**
+     * Deletes a trading deal from the database by its UUID.
+     *
+     * @param uuid The UUID of the trading deal to be deleted.
+     */
     public void delete(UUID uuid) {
         String query = "DELETE FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, uuid);
     }
 
+    /**
+     * Builds a TradingDeal entity from a database row.
+     *
+     * @param row The database row containing trading deal data.
+     * @return A TradingDeal entity built from the database row.
+     */
     private TradingDeal buildTradingDealFromRow(Row row) {
         return TradingDeal.builder()
                 .uuid(row.getUuid("uuid"))
@@ -75,6 +106,11 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
                 .build();
     }
 
+    /**
+     * Gets a singleton instance of the TradingDealRepository.
+     *
+     * @return The singleton instance of the TradingDealRepository.
+     */
     public static synchronized TradingDealRepository getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TradingDealRepository();
