@@ -17,36 +17,52 @@ class CardMapperTest {
 
     @Test
     @DisplayName("Mapping empty Card to CardDto")
-    void test_mapEmptyFields() {
+    void test_mapEmptyCardToDto() {
         Card card = Card.builder().build();
-
         assertDoesNotThrow(() -> mapper.map(card));
-
         CardDto dto = mapper.map(card);
-        assertAll(
-                () -> assertNotNull(dto),
-                () -> assertEquals(card.getUuid(), dto.uuid()),
-                () -> assertEquals(card.getName(), dto.name()),
-                () -> assertEquals(card.getDamage(), dto.damage())
-        );
+        assertionsOnMapping(dto, card);
+    }
+
+    @Test
+    @DisplayName("Mapping empty CardDto to Card")
+    void test_mapEmptyCardDtoToCard() {
+        CardDto dto = CardDto.builder().build();
+        assertDoesNotThrow(() -> mapper.map(dto));
+        Card card = mapper.map(dto);
+        assertionsOnMapping(dto, card);
     }
 
     @Test
     @DisplayName("Mapping Card to CardDto")
-    void test_mapToDto() {
+    void test_mapCardToCardDto() {
         Card card = Card.builder()
                 .uuid(UUID.randomUUID())
                 .name("test")
                 .damage(10)
                 .build();
-
         CardDto dto = mapper.map(card);
+        assertionsOnMapping(dto, card);
+    }
 
+    @Test
+    @DisplayName("Mapping CardDto to Card")
+    void test_mapCardDtoToCard() {
+        CardDto dto = CardDto.builder()
+                .uuid(UUID.randomUUID())
+                .name("test")
+                .damage(10)
+                .build();
+        Card card = mapper.map(dto);
+        assertionsOnMapping(dto, card);
+    }
+
+    private static void assertionsOnMapping(CardDto dto, Card card) {
         assertAll(
                 () -> assertNotNull(dto),
-                () -> assertEquals(card.getUuid(), dto.uuid()),
-                () -> assertEquals(card.getName(), dto.name()),
-                () -> assertEquals(card.getDamage(), dto.damage())
+                () -> assertEquals(card.getUuid(), dto.getUuid()),
+                () -> assertEquals(card.getName(), dto.getName()),
+                () -> assertEquals(card.getDamage(), dto.getDamage())
         );
     }
 }

@@ -10,6 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link UserMapper} implementations.
+ * These tests cover the functionality of mapping between {@link User}, {@link UserDataDto} and {@link UserStatsDto}.
+ */
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
     private final UserMapper mapper = new UserMapperImpl();

@@ -16,6 +16,10 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link Battle} implementations.
+ * These tests cover the functionality of the battle logic.
+ */
 class BattleTest {
     private User playerA;
     private User playerB;

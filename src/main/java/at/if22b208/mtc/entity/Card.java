@@ -88,6 +88,10 @@ public class Card {
          * @return The modified builder instance.
          */
         public CardBuilder name(String name) {
+            if (name == null) {
+                this.name = null;
+                return this;
+            }
             this.name = name.toLowerCase();
             this.cardType = this.name.contains("spell") ? CardType.SPELL : CardType.MONSTER;
             this.cardElementType = this.name.contains("fire") ? CardElementType.FIRE : this.name.contains("water") ?
