@@ -13,7 +13,6 @@ import java.util.List;
 @Slf4j
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
-    // TODO: Error handling
 
     /**
      * Deserializes a JSON string into an object of the specified type.

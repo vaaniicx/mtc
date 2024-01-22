@@ -29,6 +29,7 @@ public class UserRepository implements Repository<User, UUID> {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses FROM " + SCHEMA + TABLE;
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query);
+
         List<Optional<User>> users = new ArrayList<>();
         for (Row row : result.getRows()) {
             users.add(Optional.of(buildUserFromRow(row)));
@@ -38,6 +39,14 @@ public class UserRepository implements Repository<User, UUID> {
 
     @Override
     public Optional<User> findById(UUID uuid) {
+        String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses " +
+                "FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
+        val database = Database.getInstance();
+        Result result = database.executeSelectQuery(query, uuid);
+
+        for (Row row : result.getRows()) {
+            return Optional.of(buildUserFromRow(row));
+        }
         return Optional.empty();
     }
 

@@ -1,0 +1,166 @@
+package at.if22b208.mtc.controller;
+
+import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.dto.trading.TradingDealDto;
+import at.if22b208.mtc.entity.Card;
+import at.if22b208.mtc.entity.TradingDeal;
+import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.InvalidTradingDealException;
+import at.if22b208.mtc.server.Controller;
+import at.if22b208.mtc.server.http.ContentType;
+import at.if22b208.mtc.server.http.Request;
+import at.if22b208.mtc.server.http.Response;
+import at.if22b208.mtc.service.CardService;
+import at.if22b208.mtc.service.TradingDealService;
+import at.if22b208.mtc.service.UserService;
+import at.if22b208.mtc.util.JsonUtils;
+import at.if22b208.mtc.util.ResponseUtils;
+import at.if22b208.mtc.util.SessionUtils;
+import at.if22b208.mtc.util.mapper.TradingDealMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.util.List;
+import java.util.UUID;
+
+public class TradingController implements Controller {
+    private static TradingController INSTANCE;
+
+    private Response getTradingDeals() {
+        List<TradingDeal> deals = TradingDealService.getInstance().getAll();
+        if (!deals.isEmpty()) {
+            return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(deals.toArray()));
+        }
+        return ResponseUtils.noContent(MessageConstants.NO_TRADING_DEALS);
+    }
+
+    private Response createTradingDeal(User user, TradingDealDto dto) {
+        Card tradingCard = CardService.getInstance().getById(dto.getCardUuid());
+
+        // Can only create a deal for a card that is owned by the requesting user or card is not in deck
+        if (tradingCard == null || !hasCardOwned(user, tradingCard) || hasCardLocked(user, tradingCard)) {
+            return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARD_LOCKED);
+        }
+
+        try {
+            TradingDealService.getInstance().create(TradingDealMapper.INSTANCE.map(dto));
+        } catch (InvalidTradingDealException e) {
+            return ResponseUtils.conflict(MessageConstants.TRADING_DEAL_ALREADY_EXISTS);
+        }
+        return ResponseUtils.created(MessageConstants.TRADING_DEAL_CREATE);
+    }
+
+    private Response deleteTradingDeal(User user, UUID dealUuid) {
+        TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
+        if (deal == null) {
+            return ResponseUtils.notFound(MessageConstants.TRADING_DEAL_NOT_FOUND);
+        }
+
+        Card tradingCard = CardService.getInstance().getById(deal.getCardUuid());
+
+        // Can only delete a deal for a card that is owned by the requesting user
+        if (tradingCard == null || !hasCardOwned(user, tradingCard)) {
+            return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARD_NOT_OWNED);
+        }
+
+        TradingDealService.getInstance().deleteById(dealUuid);
+        return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.TRADING_DEAL_DELETE);
+    }
+
+    private Response carryOutDeal(User user, UUID dealUuid, UUID cardUuid) {
+        TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
+        if (deal == null) {
+            return ResponseUtils.notFound(MessageConstants.TRADING_DEAL_NOT_FOUND);
+        }
+
+        Card offeredCard = CardService.getInstance().getById(cardUuid);
+
+        // Can only delete a deal for a card that is owned by the requesting user
+        if (offeredCard == null || isUserFromDeal(user, deal) || !hasCardOwned(user, offeredCard)
+                || hasCardLocked(user, offeredCard) || !hasTradingRequirements(deal, offeredCard)) {
+            return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARRY_OUT_FAILURE);
+        }
+
+        Card tradingCard = CardService.getInstance().getById(deal.getCardUuid());
+        User tradingUser = UserService.getInstance().getById(tradingCard.getUserUuid());
+
+        CardService.getInstance().updateOwner(offeredCard, tradingUser);
+        CardService.getInstance().updateOwner(tradingCard, user);
+
+        TradingDealService.getInstance().deleteById(dealUuid);
+        return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.TRADING_DEAL_CREATE);
+    }
+
+    private boolean hasCardOwned(User user, Card card) {
+        return card.getUserUuid().equals(user.getUuid());
+    }
+
+    private boolean hasCardLocked(User user, Card card) {
+        return user.getDeck().stream()
+                .anyMatch(c -> c.getUuid().equals(card.getUuid()));
+    }
+
+    private boolean hasTradingRequirements(TradingDeal deal, Card offeredCard) {
+        return deal.getCardType().equals(offeredCard.getCardType())
+                && deal.getMinimumDamage() <= offeredCard.getDamage();
+    }
+
+    private boolean isUserFromDeal(User user, TradingDeal deal) {
+        return user.getUuid().equals(CardService.getInstance().getById(deal.getCardUuid())
+                        .getUserUuid());
+    }
+
+    @Override
+    public Response handleRequest(Request request) throws JsonProcessingException {
+        if (!SessionUtils.isAuthorized(request.getHeader())) {
+            return ResponseUtils.unauthorized();
+        }
+
+        // Retrieve the username from the user session
+        String username = SessionUtils.getUsernameFromHeader(request.getHeader());
+        User user = UserService.getInstance().getByUsername(username);
+        if (user == null) {
+            return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
+        }
+
+        String root = request.getRoot();
+        if (root.equalsIgnoreCase("tradings")) {
+            if (request.getPathParts().size() == 1) {
+                switch (request.getMethod()) {
+                    case GET -> {
+                        return getTradingDeals();
+                    }
+                    case POST -> {
+                        String body = request.getBody().toLowerCase();
+                        TradingDealDto dealDto = JsonUtils.getObjectFromJsonString(body, TradingDealDto.class);
+                        if (dealDto != null) {
+                            return createTradingDeal(user, dealDto);
+                        }
+                    }
+                }
+            }
+
+            if (request.getPathParts().size() == 2) {
+                UUID dealUuid = UUID.fromString(request.getPathParts().get(1));
+
+                switch (request.getMethod()) {
+                    case POST -> {
+                        String body = request.getBody().toLowerCase();
+                        UUID cardUuid = JsonUtils.getObjectFromJsonString(body, UUID.class);
+                        return carryOutDeal(user, dealUuid, cardUuid);
+                    }
+                    case DELETE -> {
+                        return deleteTradingDeal(user, dealUuid);
+                    }
+                }
+            }
+        }
+        return ResponseUtils.notImplemented();
+    }
+
+    public static synchronized TradingController getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new TradingController();
+        }
+        return INSTANCE;
+    }
+}

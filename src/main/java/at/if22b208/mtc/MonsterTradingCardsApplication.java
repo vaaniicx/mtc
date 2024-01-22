@@ -36,7 +36,7 @@ public class MonsterTradingCardsApplication {
         router.addController("/stats", StatisticController.getInstance());
         router.addController("/scoreboard", ScoreboardController.getInstance());
         router.addController("/battles", BattleController.getInstance());
-        router.addController("/tradings", null);
+        router.addController("/tradings", TradingController.getInstance());
         return router;
     }
 }

@@ -37,9 +37,9 @@ public class MessageConstants {
     public static final String NO_TRADING_DEALS = "The request was fine, but there are no trading deals available.";
     public static final String TRADING_DEAL_CARD_LOCKED = "The deal contains a card that is not owned by the user or locked in the deck.";
     public static final String TRADING_DEAL_ALREADY_EXISTS = "A deal with this deal ID already exists.";
-    public static final String DELETE_TRADING_DEAL = "Trading deal successfully deleted.";
+    public static final String TRADING_DEAL_DELETE = "Trading deal successfully deleted.";
     public static final String TRADING_DEAL_CARD_NOT_OWNED = "The deal contains a card that is not owned by the user.";
     public static final String TRADING_DEAL_NOT_FOUND = "The provided deal ID was not found.";
-    public static final String TRADING_DEAL_EXECUTED = "Trading deal successfully executed.";
-    public static final String TRADING_DEAL_EXECUTE_FAILURE = "The offered card is not owned by the user, or the requirements are not met (Type, MinimumDamage), or the offered card is locked in the deck.";
+    public static final String TRADING_DEAL_CREATE = "Trading deal successfully executed.";
+    public static final String TRADING_DEAL_CARRY_OUT_FAILURE = "The offered card is not owned by the user, or the requirements are not met (Type, MinimumDamage), or the offered card is locked in the deck.";
 }

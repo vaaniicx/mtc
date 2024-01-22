@@ -15,5 +15,5 @@ public class TradingDealDto {
     @JsonProperty("type")
     private CardType cardType;
     @JsonProperty("minimumdamage")
-    private int minimumDamage;
+    private double minimumDamage;
 }
