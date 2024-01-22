@@ -58,10 +58,21 @@ public class BattleController implements Controller {
         }
     }
 
+    /**
+     * Checks if player A won the battle.
+     *
+     * @param battle The Battle object representing the battle.
+     * @return True if player A won, false otherwise.
+     */
     private static boolean isPlayerAWon(Battle battle) {
         return battle.getWinner().getUuid() == battle.getPlayerA().getUuid();
     }
 
+    /**
+     * Updates the user's statistics data after a battle, including Elo rating.
+     *
+     * @param user The User object representing the player.
+     */
     private static void updateUserStatisticData(User user) {
         UserService.getInstance().updateElo(user);
     }
