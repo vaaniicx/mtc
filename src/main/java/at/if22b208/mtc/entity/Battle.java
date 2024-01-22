@@ -10,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.IntStream;
 
 /**
  * Represents a battle between two players with decks of cards.
@@ -47,9 +49,9 @@ public class Battle {
 
             Round round = createRound(i);
 
-            handleMonsterFight(round, cardA, cardB);
-            handleSpellFight(round, cardA, cardB);
-            handleMixedFight(round, cardA, cardB);
+            handleMonsterFight(round, Card.copy(cardA), Card.copy(cardB));
+            handleSpellFight(round, Card.copy(cardA), Card.copy(cardB));
+            handleMixedFight(round, Card.copy(cardA), Card.copy(cardB));
 
             this.rounds.add(round);
             overtakeCard(round);
@@ -343,7 +345,11 @@ public class Battle {
             User currentWinner = roundWinnerCard.getUserUuid().equals(playerA.getUuid()) ? playerA : playerB;
             User currentLoser = roundLoserCard.getUserUuid().equals(playerB.getUuid()) ? playerB : playerA;
 
-            int indexOfLoserCard = currentLoser.getDeck().indexOf(roundLoserCard);
+            UUID loserCardUuid = roundLoserCard.getUuid();
+            int indexOfLoserCard = IntStream.range(0, currentLoser.getDeck().size())
+                    .filter(index -> currentLoser.getDeck().get(index).getUuid().equals(loserCardUuid))
+                    .findFirst()
+                    .orElse(-1);
             if (indexOfLoserCard != -1) {
                 List<Card> loserDeck = new ArrayList<>(currentLoser.getDeck());
                 Card cardToOvertake = loserDeck.remove(indexOfLoserCard);
