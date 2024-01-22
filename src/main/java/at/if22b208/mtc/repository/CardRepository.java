@@ -123,7 +123,7 @@ public class CardRepository implements Repository<Card, UUID> {
         return Card.builder()
                 .uuid(row.getUuid("uuid"))
                 .name(row.getString("name"))
-                .damage(row.getInt("damage"))
+                .damage(row.getDouble("damage"))
                 .packageId(row.getInt("package_id"))
                 .userUuid(row.getUuid("user_uuid"))
                 .build();

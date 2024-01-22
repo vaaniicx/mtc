@@ -29,4 +29,8 @@ public class Row {
     public String getString(String column) {
         return (String) getContent().get(column);
     }
+
+    public Double getDouble(String column) {
+        return (Double) getContent().get(column);
+    }
 }

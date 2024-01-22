@@ -17,9 +17,9 @@ CREATE TABLE IF NOT EXISTS mtc.public.card
 (
     uuid       uuid PRIMARY KEY NOT NULL,
     name       varchar          NOT NULL,
-    damage     int4 default 0,
+    damage     float8 default 0,
     user_uuid  uuid REFERENCES mtc.public.user (uuid),
-    deck       bool default false,
+    deck       bool   default false,
     package_id int4             NOT NULL
 );
 

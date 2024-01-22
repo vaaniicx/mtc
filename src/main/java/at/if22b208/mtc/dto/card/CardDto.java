@@ -4,5 +4,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
-public record CardDto(@JsonProperty("id") UUID uuid, String name, int damage) {
+public record CardDto(@JsonProperty("id") UUID uuid, String name, double damage) {
 }

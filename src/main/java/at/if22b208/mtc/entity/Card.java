@@ -37,7 +37,7 @@ public class Card {
     /**
      * The damage value associated with the card.
      */
-    private int damage;
+    private double damage;
 
     /**
      * The ID of the package to which the card belongs.
@@ -58,6 +58,24 @@ public class Card {
      * The element type of the card.
      */
     private CardElementType cardElementType;
+
+    /**
+     * Copy constructor to create a new instance with the same values as an existing card.
+     *
+     * @param originalCard The original card to be copied.
+     * @return A new instance of {@code Card} with the same values as the original card.
+     */
+    public static Card copy(Card originalCard) {
+        return Card.builder()
+                .uuid(originalCard.getUuid())
+                .name(originalCard.getName())
+                .damage(originalCard.getDamage())
+                .packageId(originalCard.getPackageId())
+                .userUuid(originalCard.getUserUuid())
+                .cardType(originalCard.getCardType())
+                .cardElementType(originalCard.getCardElementType())
+                .build();
+    }
 
     public static class CardBuilder {
         public CardBuilder name(String name) {
