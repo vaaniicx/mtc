@@ -14,7 +14,7 @@ Die Applikation besteht aus den Paketen `config`, `controller`, `database`, `dto
 >**util**: Verschiedene Utility-Klassen, die logisch zusammengelegte Funktionen zur Vereinfachung des restlichen Codes bieten<br>
 
 ## Lessions learned
-- Entwicklung wird ernorm erleichtert durch
+- Entwicklung wird enorm erleichtert durch
     - Klare Anforderungen
     - Klar definierte Testfälle/-Scripts
 - Guter Code erfordert ausreichend Zeit (Aber: Diamanten entstehen nur unter Druck ;))
