@@ -1,8 +1,12 @@
 package at.if22b208.mtc.controller;
 
+import java.util.List;
+
 import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.card.CardDto;
 import at.if22b208.mtc.entity.Card;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.exception.InvalidPackageException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.Method;
@@ -14,8 +18,6 @@ import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.CardMapper;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * Controller class for handling card package-related operations.
@@ -36,7 +38,7 @@ public class PackageController implements Controller {
      * @param cardDtoList The list of card DTOs to be included in the package.
      * @return A response indicating the success or failure of the package creation.
      */
-    private Response createPackage(List<CardDto> cardDtoList) {
+    private Response createPackage(List<CardDto> cardDtoList) throws DatabaseTransactionException {
         int packageId = CardService.getInstance().getNextPackageId();
 
         for (CardDto dto : cardDtoList) {
@@ -74,16 +76,31 @@ public class PackageController implements Controller {
             return ResponseUtils.forbidden(MessageConstants.INSUFFICIENT_PRIVILEGE);
         }
 
-        String root = request.getRoot();
-        if (root.equalsIgnoreCase("packages")) {
-            if (request.getMethod() == Method.POST) {
-                if (request.getPathParts().size() == 1) {
-                    String body = request.getBody().toLowerCase();
-                    List<CardDto> dtoList = JsonUtils.getListFromJsonString(body, CardDto.class);
-                    return createPackage(dtoList);
+        Transaction transaction = new Transaction();
+        try {
+            String root = request.getRoot();
+            if (root.equalsIgnoreCase("packages")) {
+                if (request.getMethod() == Method.POST) {
+                    if (request.getPathParts().size() == 1) {
+                        String body = request.getBody().toLowerCase();
+                        List<CardDto> dtoList = JsonUtils.getListFromJsonString(body, CardDto.class);
+
+                        Response response = createPackage(dtoList);
+                        transaction.commit();
+
+                        return response;
+                    }
                 }
             }
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
+            }
+            return ResponseUtils.error("Error performing database transaction. See logs for further information.");
         }
+
         return ResponseUtils.notImplemented();
     }
 

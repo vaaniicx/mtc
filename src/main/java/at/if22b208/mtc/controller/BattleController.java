@@ -1,8 +1,10 @@
 package at.if22b208.mtc.controller;
 
 import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.entity.Battle;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Method;
@@ -33,7 +35,7 @@ public class BattleController implements Controller {
      * @param user The user waiting for the battle.
      * @return Response indicating the outcome of the battle.
      */
-    private Response waitForBattleToBeReady(User user) {
+    private Response waitForBattleToBeReady(User user) throws DatabaseTransactionException {
         try {
             Battle battle = BattleService.getInstance().enterBattleQueue(user);
 
@@ -73,7 +75,7 @@ public class BattleController implements Controller {
      *
      * @param user The User object representing the player.
      */
-    private static void updateUserStatisticData(User user) {
+    private static void updateUserStatisticData(User user) throws DatabaseTransactionException {
         UserService.getInstance().updateElo(user);
     }
 
@@ -91,14 +93,29 @@ public class BattleController implements Controller {
         }
 
         String root = request.getRoot();
-        if (root.equalsIgnoreCase("battles")) {
-            if (request.getMethod() == Method.POST) {
-                // Retrieve the username from the user session
-                String username = SessionUtils.getUsernameFromHeader(request.getHeader());
-                User user = UserService.getInstance().getByUsername(username);
-                return waitForBattleToBeReady(user);
+        Transaction transaction = new Transaction();
+        try {
+            if (root.equalsIgnoreCase("battles")) {
+                if (request.getMethod() == Method.POST) {
+                    // Retrieve the username from the user session
+                    String username = SessionUtils.getUsernameFromHeader(request.getHeader());
+                    User user = UserService.getInstance().getByUsername(username);
+
+                    Response response = waitForBattleToBeReady(user);
+                    transaction.commit();
+
+                    return response;
+                }
             }
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
+            }
+            return ResponseUtils.error("Error performing database transaction. See logs for further information.");
         }
+
         return ResponseUtils.notImplemented();
     }
 

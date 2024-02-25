@@ -1,16 +1,17 @@
 package at.if22b208.mtc.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import at.if22b208.mtc.database.Database;
 import at.if22b208.mtc.database.Result;
 import at.if22b208.mtc.database.Row;
 import at.if22b208.mtc.entity.TradingDeal;
 import at.if22b208.mtc.entity.enumeration.CardType;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import lombok.val;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * The {@code TradingDealRepository} class is responsible for handling database operations related to trading deals.
@@ -34,7 +35,7 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
      * @return A list of all trading deals in the database.
      */
     @Override
-    public List<Optional<TradingDeal>> findAll() {
+    public List<Optional<TradingDeal>> findAll() throws DatabaseTransactionException {
         String query = "SELECT uuid, card_uuid, card_type, card_damage FROM " + SCHEMA + TABLE;
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query);
@@ -53,7 +54,7 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
      * @return An Optional containing the found trading deal, or an empty Optional if not found.
      */
     @Override
-    public Optional<TradingDeal> findById(UUID uuid) {
+    public Optional<TradingDeal> findById(UUID uuid) throws DatabaseTransactionException {
         String query = "SELECT uuid, card_uuid, card_type, card_damage FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query, uuid);
@@ -71,7 +72,7 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
      * @return The created trading deal.
      */
     @Override
-    public TradingDeal create(TradingDeal deal) {
+    public TradingDeal create(TradingDeal deal) throws DatabaseTransactionException {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, card_uuid, card_type, card_damage)" +
                 " VALUES (?, ?, ?, ?)";
         val database = Database.getInstance();
@@ -85,7 +86,7 @@ public class TradingDealRepository implements Repository<TradingDeal, UUID> {
      *
      * @param uuid The UUID of the trading deal to be deleted.
      */
-    public void delete(UUID uuid) {
+    public void delete(UUID uuid) throws DatabaseTransactionException {
         String query = "DELETE FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, uuid);

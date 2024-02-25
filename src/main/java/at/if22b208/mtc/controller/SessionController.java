@@ -1,8 +1,12 @@
 package at.if22b208.mtc.controller;
 
+import java.util.Objects;
+
 import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.user.UserCredentialsDto;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.exception.HashingException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
@@ -15,8 +19,6 @@ import at.if22b208.mtc.util.HashingUtils;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
 
 /**
  * Controller class for handling user sessions and login functionality.
@@ -35,15 +37,17 @@ public class SessionController implements Controller {
      * @param credentialsDto The {@link UserCredentialsDto} containing username and password.
      * @return A {@link Response} object representing the result of the login attempt.
      */
-    private Response login(UserCredentialsDto credentialsDto) {
+    private Response login(UserCredentialsDto credentialsDto) throws DatabaseTransactionException {
         try {
             // Hash the provided password
-            String hash = HashingUtils.hash(credentialsDto.getPassword(), HashingUtils.generateSalt(credentialsDto.getUsername()));
+            String hash = HashingUtils.hash(credentialsDto.getPassword(),
+                                            HashingUtils.generateSalt(credentialsDto.getUsername()));
             // Retrieve the user by username
             User user = UserService.getInstance().getByUsername(credentialsDto.getUsername());
             if (user != null) {
                 // Check if the user exists and if the provided username and password match
-                if (Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(user.getPassword(), hash)) {
+                if (Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(
+                    user.getPassword(), hash)) {
                     // Successful login
                     String token = SessionManager.createSession(user.getUsername());
                     return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));
@@ -68,17 +72,31 @@ public class SessionController implements Controller {
     public Response handleRequest(Request request) {
         String root = request.getRoot();
 
-        if (root.equalsIgnoreCase("sessions")) {
-            if (request.getMethod() == Method.POST) {
-                if (request.getPathParts().size() == 1) {
-                    String body = request.getBody().toLowerCase();
-                    UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
-                    if (dto == null) {
-                        return ResponseUtils.notImplemented();
+        Transaction transaction = new Transaction();
+        try {
+            if (root.equalsIgnoreCase("sessions")) {
+                if (request.getMethod() == Method.POST) {
+                    if (request.getPathParts().size() == 1) {
+                        String body = request.getBody().toLowerCase();
+                        UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
+                        if (dto == null) {
+                            return ResponseUtils.notImplemented();
+                        }
+
+                        Response response = login(dto);
+                        transaction.commit();
+
+                        return response;
                     }
-                    return login(dto);
                 }
             }
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
+            }
+            return ResponseUtils.error("Error performing database transaction. See logs for further information.");
         }
         return ResponseUtils.notImplemented();
     }

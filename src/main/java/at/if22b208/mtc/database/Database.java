@@ -1,12 +1,19 @@
 package at.if22b208.mtc.database;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import at.if22b208.mtc.exception.DatabaseTransactionException;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Database class for managing PostgreSQL database interactions.
@@ -56,7 +63,7 @@ public class Database implements AutoCloseable {
      * @param query  The SQL query to execute.
      * @param params Parameters to be used in the query.
      */
-    public void executeUpdateQuery(String query, Object... params) {
+    public void executeUpdateQuery(String query, Object... params) throws DatabaseTransactionException {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
@@ -64,6 +71,7 @@ public class Database implements AutoCloseable {
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
+            throw new DatabaseTransactionException("");
         }
     }
 
@@ -74,7 +82,7 @@ public class Database implements AutoCloseable {
      * @param params Parameters to be used in the query.
      * @return The UUID of the inserted row.
      */
-    public UUID executeInsertQuery(String query, Object... params) {
+    public UUID executeInsertQuery(String query, Object... params) throws DatabaseTransactionException {
         try (PreparedStatement statement = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < params.length; i++) {
@@ -94,6 +102,7 @@ public class Database implements AutoCloseable {
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
+            throw new DatabaseTransactionException("");
         }
         return null;
     }
@@ -105,7 +114,7 @@ public class Database implements AutoCloseable {
      * @param params Parameters to be used in the query.
      * @return The result of the select query.
      */
-    public Result executeSelectQuery(String query, Object... params) {
+    public Result executeSelectQuery(String query, Object... params) throws DatabaseTransactionException {
         Result result = Result.builder().build();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -130,6 +139,7 @@ public class Database implements AutoCloseable {
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
+            throw new DatabaseTransactionException("");
         }
         return result;
     }

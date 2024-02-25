@@ -1,7 +1,12 @@
 package at.if22b208.mtc.controller;
 
+import java.util.Comparator;
+import java.util.List;
+
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.user.UserStatsDto;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Method;
@@ -13,13 +18,12 @@ import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.util.Comparator;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller class for handling scoreboard-related operations.
  */
+@Slf4j
 public class ScoreboardController implements Controller {
     private static ScoreboardController INSTANCE;
 
@@ -32,12 +36,12 @@ public class ScoreboardController implements Controller {
      *
      * @return Response containing the scoreboard in JSON format.
      */
-    private Response getScoreboard() {
+    private Response getScoreboard() throws DatabaseTransactionException {
         List<User> users = UserService.getInstance().getAll();
         List<UserStatsDto> dtos = users.stream()
-                .map(UserMapper.INSTANCE::mapToUserStatsDto)
-                .sorted(Comparator.comparing(UserStatsDto::elo).reversed())
-                .toList();
+                                       .map(UserMapper.INSTANCE::mapToUserStatsDto)
+                                       .sorted(Comparator.comparing(UserStatsDto::elo).reversed())
+                                       .toList();
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtos.toArray()));
     }
 
@@ -56,12 +60,25 @@ public class ScoreboardController implements Controller {
         }
 
         String root = request.getRoot();
-        if (root.equalsIgnoreCase("scoreboard")) {
-            if (request.getMethod() == Method.GET) {
-                // Handle GET requests for the scoreboard
-                return this.getScoreboard();
+        Transaction transaction = new Transaction();
+        try {
+            if (root.equalsIgnoreCase("scoreboard")) {
+                if (request.getMethod() == Method.GET) {
+                    Response response = this.getScoreboard();
+                    transaction.commit();
+
+                    return response;
+                }
             }
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
+            }
+            return ResponseUtils.error("Error performing database transaction. See logs for further information.");
         }
+
         return ResponseUtils.notImplemented();
     }
 

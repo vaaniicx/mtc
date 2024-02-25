@@ -1,10 +1,15 @@
 package at.if22b208.mtc.controller;
 
+import java.util.List;
+import java.util.UUID;
+
 import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.trading.TradingDealDto;
 import at.if22b208.mtc.entity.Card;
 import at.if22b208.mtc.entity.TradingDeal;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.exception.InvalidTradingDealException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
@@ -18,22 +23,22 @@ import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.TradingDealMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.util.List;
-import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller class for handling trading deals.
  */
+@Slf4j
 public class TradingController implements Controller {
     private static TradingController INSTANCE;
 
     /**
      * Retrieves all trading deals from the system.
      *
-     * @return A response containing a list of trading deals in JSON format, or a no-content response if no deals are available.
+     * @return A response containing a list of trading deals in JSON format, or a no-content response if no deals are
+     * available.
      */
-    private Response getTradingDeals() {
+    private Response getTradingDeals() throws DatabaseTransactionException {
         List<TradingDeal> deals = TradingDealService.getInstance().getAll();
         if (!deals.isEmpty()) {
             return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(deals.toArray()));
@@ -49,7 +54,7 @@ public class TradingController implements Controller {
      * @param dto  The trading deal data transfer object.
      * @return A response indicating the success or failure of the trading deal creation.
      */
-    private Response createTradingDeal(User user, TradingDealDto dto) {
+    private Response createTradingDeal(User user, TradingDealDto dto) throws DatabaseTransactionException {
         Card tradingCard = CardService.getInstance().getById(dto.getCardUuid());
 
         // Can only create a deal for a card that is owned by the requesting user or card is not in deck
@@ -69,11 +74,11 @@ public class TradingController implements Controller {
      * Deletes a trading deal initiated by the user.
      * Validates the ownership of the trading card associated with the deal.
      *
-     * @param user    The user initiating the deletion.
+     * @param user     The user initiating the deletion.
      * @param dealUuid The UUID of the trading deal to be deleted.
      * @return A response indicating the success or failure of the trading deal deletion.
      */
-    private Response deleteTradingDeal(User user, UUID dealUuid) {
+    private Response deleteTradingDeal(User user, UUID dealUuid) throws DatabaseTransactionException {
         TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
         if (deal == null) {
             return ResponseUtils.notFound(MessageConstants.TRADING_DEAL_NOT_FOUND);
@@ -94,12 +99,12 @@ public class TradingController implements Controller {
      * Carries out a trading deal by transferring ownership of cards between users.
      * Validates the ownership and trading requirements before completing the deal.
      *
-     * @param user    The user initiating the deal.
+     * @param user     The user initiating the deal.
      * @param dealUuid The UUID of the trading deal to be carried out.
      * @param cardUuid The UUID of the card offered by the user to complete the deal.
      * @return A response indicating the success or failure of carrying out the trading deal.
      */
-    private Response carryOutDeal(User user, UUID dealUuid, UUID cardUuid) {
+    private Response carryOutDeal(User user, UUID dealUuid, UUID cardUuid) throws DatabaseTransactionException {
         TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
         if (deal == null) {
             return ResponseUtils.notFound(MessageConstants.TRADING_DEAL_NOT_FOUND);
@@ -109,7 +114,7 @@ public class TradingController implements Controller {
 
         // Can only delete a deal for a card that is owned by the requesting user
         if (offeredCard == null || isUserFromDeal(user, deal) || !hasCardOwned(user, offeredCard)
-                || hasCardLocked(user, offeredCard) || !hasTradingRequirements(deal, offeredCard)) {
+            || hasCardLocked(user, offeredCard) || !hasTradingRequirements(deal, offeredCard)) {
             return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARRY_OUT_FAILURE);
         }
 
@@ -143,19 +148,19 @@ public class TradingController implements Controller {
      */
     private boolean hasCardLocked(User user, Card card) {
         return user.getDeck().stream()
-                .anyMatch(c -> c.getUuid().equals(card.getUuid()));
+                   .anyMatch(c -> c.getUuid().equals(card.getUuid()));
     }
 
     /**
      * Checks if the card meets the trading requirements specified in the deal.
      *
-     * @param deal         The trading deal containing the requirements.
+     * @param deal        The trading deal containing the requirements.
      * @param offeredCard The card offered by the user.
      * @return True if the card meets the trading requirements, false otherwise.
      */
     private boolean hasTradingRequirements(TradingDeal deal, Card offeredCard) {
         return deal.getCardType().equals(offeredCard.getCardType())
-                && deal.getMinimumDamage() <= offeredCard.getDamage();
+               && deal.getMinimumDamage() <= offeredCard.getDamage();
     }
 
     /**
@@ -165,9 +170,9 @@ public class TradingController implements Controller {
      * @param deal The trading deal containing the card UUID.
      * @return True if the user is the owner, false otherwise.
      */
-    private boolean isUserFromDeal(User user, TradingDeal deal) {
+    private boolean isUserFromDeal(User user, TradingDeal deal) throws DatabaseTransactionException {
         return user.getUuid().equals(CardService.getInstance().getById(deal.getCardUuid())
-                        .getUserUuid());
+                                                .getUserUuid());
     }
 
     /**
@@ -184,45 +189,60 @@ public class TradingController implements Controller {
             return ResponseUtils.unauthorized();
         }
 
-        // Retrieve the username from the user session
-        String username = SessionUtils.getUsernameFromHeader(request.getHeader());
-        User user = UserService.getInstance().getByUsername(username);
-        if (user == null) {
-            return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
-        }
 
-        String root = request.getRoot();
-        if (root.equalsIgnoreCase("tradings")) {
-            if (request.getPathParts().size() == 1) {
-                switch (request.getMethod()) {
-                    case GET -> {
-                        return getTradingDeals();
+        Transaction transaction = new Transaction();
+        try {
+            // Retrieve the username from the user session
+            String username = SessionUtils.getUsernameFromHeader(request.getHeader());
+            User user = UserService.getInstance().getByUsername(username);
+            if (user == null) {
+                return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
+            }
+
+            String root = request.getRoot();
+            if (root.equalsIgnoreCase("tradings")) {
+                if (request.getPathParts().size() == 1) {
+                    switch (request.getMethod()) {
+                        case GET -> {
+                            Response response = getTradingDeals();
+                            transaction.commit();
+
+                            return response;
+                        }
+                        case POST -> {
+                            String body = request.getBody().toLowerCase();
+                            TradingDealDto dealDto = JsonUtils.getObjectFromJsonString(body, TradingDealDto.class);
+                            if (dealDto != null) {
+                                return createTradingDeal(user, dealDto);
+                            }
+                        }
                     }
-                    case POST -> {
-                        String body = request.getBody().toLowerCase();
-                        TradingDealDto dealDto = JsonUtils.getObjectFromJsonString(body, TradingDealDto.class);
-                        if (dealDto != null) {
-                            return createTradingDeal(user, dealDto);
+                }
+
+                if (request.getPathParts().size() == 2) {
+                    UUID dealUuid = UUID.fromString(request.getPathParts().get(1));
+
+                    switch (request.getMethod()) {
+                        case POST -> {
+                            String body = request.getBody().toLowerCase();
+                            UUID cardUuid = JsonUtils.getObjectFromJsonString(body, UUID.class);
+                            return carryOutDeal(user, dealUuid, cardUuid);
+                        }
+                        case DELETE -> {
+                            return deleteTradingDeal(user, dealUuid);
                         }
                     }
                 }
             }
-
-            if (request.getPathParts().size() == 2) {
-                UUID dealUuid = UUID.fromString(request.getPathParts().get(1));
-
-                switch (request.getMethod()) {
-                    case POST -> {
-                        String body = request.getBody().toLowerCase();
-                        UUID cardUuid = JsonUtils.getObjectFromJsonString(body, UUID.class);
-                        return carryOutDeal(user, dealUuid, cardUuid);
-                    }
-                    case DELETE -> {
-                        return deleteTradingDeal(user, dealUuid);
-                    }
-                }
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
             }
+            return ResponseUtils.error("Error performing database transaction. See logs for further information.");
         }
+
         return ResponseUtils.notImplemented();
     }
 

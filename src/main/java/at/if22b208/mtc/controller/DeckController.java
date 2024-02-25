@@ -1,9 +1,18 @@
 package at.if22b208.mtc.controller;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.entity.Card;
 import at.if22b208.mtc.entity.TradingDeal;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.server.Controller;
 import at.if22b208.mtc.server.http.ContentType;
 import at.if22b208.mtc.server.http.Request;
@@ -14,16 +23,12 @@ import at.if22b208.mtc.service.UserService;
 import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller class for handling deck-related operations.
  */
+@Slf4j
 public class DeckController implements Controller {
     private static DeckController INSTANCE;
 
@@ -38,7 +43,7 @@ public class DeckController implements Controller {
      * @param type     The type of deck format (e.g., "format=plain").
      * @return Response containing the deck information in the specified format.
      */
-    private Response getDeck(String username, String type) {
+    private Response getDeck(String username, String type) throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -66,7 +71,7 @@ public class DeckController implements Controller {
      * @param uuids    List of UUIDs representing the cards to include in the deck.
      * @return Response indicating the success or failure of the deck configuration.
      */
-    private Response configureDeck(String username, List<UUID> uuids) {
+    private Response configureDeck(String username, List<UUID> uuids) throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -84,7 +89,15 @@ public class DeckController implements Controller {
 
         if (ownedCards.containsAll(uuids) && !hasCardLockedInTradingDeal(uuids)) {
             // Set the user's deck with the specified card UUIDs
-            user.setDeck(uuids.stream().map(CardService.getInstance()::getById).toList());
+            List<Card> list = new ArrayList<>();
+
+            CardService cardService = CardService.getInstance();
+            for (UUID uuid : uuids) {
+                Card byId = cardService.getById(uuid);
+                list.add(byId);
+            }
+
+            user.setDeck(list);
             UserService.getInstance().updateDeck(user);
             return ResponseUtils.ok(ContentType.PLAIN_TEXT, MessageConstants.CONFIGURE_DECK);
         }
@@ -98,7 +111,7 @@ public class DeckController implements Controller {
      * @param uuids List of UUIDs representing the cards to check.
      * @return True if any of the cards are locked in a trading deal; otherwise, false.
      */
-    private boolean hasCardLockedInTradingDeal(List<UUID> uuids) {
+    private boolean hasCardLockedInTradingDeal(List<UUID> uuids) throws DatabaseTransactionException {
         List<TradingDeal> deals = TradingDealService.getInstance().getAll();
         return deals.stream()
                 .map(TradingDeal::getCardUuid)
@@ -118,13 +131,30 @@ public class DeckController implements Controller {
 
         String root = request.getRoot();
         Response response = ResponseUtils.notImplemented();
-        if ("deck".equals(root)) {
-            switch (request.getMethod()) {
-                case GET -> response = getDeck(username, request.getParams());
-                case PUT ->
+
+        Transaction transaction = new Transaction();
+        try {
+            if ("deck".equals(root)) {
+                switch (request.getMethod()) {
+                    case GET -> {
+                        response = getDeck(username, request.getParams());
+                        transaction.commit();
+                    }
+                    case PUT -> {
                         response = configureDeck(username, JsonUtils.getListFromJsonString(request.getBody(), UUID.class));
+                        transaction.commit();
+                    }
+                }
             }
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
+            }
+            return ResponseUtils.error("Error performing database transaction. See logs for further information.");
         }
+
         return response;
     }
 

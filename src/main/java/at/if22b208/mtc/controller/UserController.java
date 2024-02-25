@@ -1,9 +1,11 @@
 package at.if22b208.mtc.controller;
 
 import at.if22b208.mtc.config.MessageConstants;
+import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.user.UserCredentialsDto;
 import at.if22b208.mtc.dto.user.UserDataDto;
 import at.if22b208.mtc.entity.User;
+import at.if22b208.mtc.exception.DatabaseTransactionException;
 import at.if22b208.mtc.exception.HashingException;
 import at.if22b208.mtc.exception.NameNotValidException;
 import at.if22b208.mtc.server.Controller;
@@ -37,7 +39,8 @@ public class UserController implements Controller {
      * @return Response indicating the success or failure of the user creation.
      * @throws HashingException If an error occurs during password hashing.
      */
-    private Response createUserWithCredentials(UserCredentialsDto dto) throws HashingException {
+    private Response createUserWithCredentials(UserCredentialsDto dto)
+        throws HashingException, DatabaseTransactionException {
         User user = User.builder()
                 .username(dto.getUsername())
                 .password(HashingUtils.hash(dto.getPassword(), HashingUtils.generateSalt(dto.getUsername())))
@@ -57,7 +60,7 @@ public class UserController implements Controller {
      * @param dto      The user data DTO containing updated information.
      * @return Response indicating the success or failure of the user data update.
      */
-    private Response updateUserData(String username, UserDataDto dto) {
+    private Response updateUserData(String username, UserDataDto dto) throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -80,7 +83,7 @@ public class UserController implements Controller {
      * @param username The username of the user to retrieve.
      * @return Response containing user information in JSON format.
      */
-    private Response getUserByUsername(String username) {
+    private Response getUserByUsername(String username) throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -101,37 +104,59 @@ public class UserController implements Controller {
     public Response handleRequest(Request request) {
         String root = request.getRoot();
 
-        if (root.equalsIgnoreCase("users")) {
-            String body = request.getBody();
-            if (request.getMethod() == Method.POST) {
-                if (request.getPathParts().size() == 1) {
-                    UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
-                    try {
-                        if (dto == null) {
-                            return ResponseUtils.notImplemented();
+        Transaction transaction = new Transaction();
+        try {
+            if (root.equalsIgnoreCase("users")) {
+                String body = request.getBody();
+                if (request.getMethod() == Method.POST) {
+                    if (request.getPathParts().size() == 1) {
+                        UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
+                        try {
+                            if (dto == null) {
+                                return ResponseUtils.notImplemented();
+                            }
+
+                            Response response = this.createUserWithCredentials(dto);
+                            transaction.commit();
+
+                            return response;
+                        } catch (HashingException e) {
+                            log.warn(e.getMessage());
                         }
-                        return this.createUserWithCredentials(dto);
-                    } catch (HashingException e) {
-                        log.warn(e.getMessage());
+                    }
+                }
+
+                if (!SessionUtils.isAuthorized(request.getHeader())) {
+                    return ResponseUtils.unauthorized();
+                }
+
+                if (request.getPathParts().size() == 2) {
+                    if (request.getMethod() == Method.GET) {
+                        Response response = this.getUserByUsername(request.getPathParts().get(1));
+                        transaction.commit();
+
+                        return response;
+                    }
+
+                    if (request.getMethod() == Method.PUT) {
+                        UserDataDto dto = JsonUtils.getObjectFromJsonString(body, UserDataDto.class);
+
+                        Response response = this.updateUserData(request.getPathParts().get(1), dto);
+                        transaction.commit();
+
+                        return response;
                     }
                 }
             }
-
-            if (!SessionUtils.isAuthorized(request.getHeader())) {
-                return ResponseUtils.unauthorized();
+        } catch (DatabaseTransactionException e) {
+            try {
+                transaction.rollback();
+            } catch (DatabaseTransactionException rollbackException) {
+                log.error("Failed to rollback transaction: {}", rollbackException.getMessage());
             }
-
-            if (request.getPathParts().size() == 2) {
-                if (request.getMethod() == Method.GET) {
-                    return this.getUserByUsername(request.getPathParts().get(1));
-                }
-
-                if (request.getMethod() == Method.PUT) {
-                    UserDataDto dto = JsonUtils.getObjectFromJsonString(body, UserDataDto.class);
-                    return this.updateUserData(request.getPathParts().get(1), dto);
-                }
-            }
+            return ResponseUtils.error("Error performing database transaction.");
         }
+
         return ResponseUtils.notImplemented();
     }
 
