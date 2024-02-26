@@ -23,6 +23,7 @@ import lombok.val;
  */
 public class CardRepository implements Repository<Card, UUID> {
     private static CardRepository INSTANCE;
+
     private static final String TABLE = "card";
 
     /**
@@ -42,7 +43,8 @@ public class CardRepository implements Repository<Card, UUID> {
      * @return An Optional containing the found card, or an empty Optional if not found.
      */
     @Override
-    public Optional<Card> findById(UUID uuid) throws DatabaseTransactionException {
+    public Optional<Card> findById(UUID uuid)
+            throws DatabaseTransactionException {
         String query = "SELECT uuid, name, damage, user_uuid, package_id FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         val result = database.executeSelectQuery(query, uuid);
@@ -61,7 +63,8 @@ public class CardRepository implements Repository<Card, UUID> {
      * @return The created card with its UUID set.
      */
     @Override
-    public Card create(Card card) throws DatabaseTransactionException {
+    public Card create(Card card)
+            throws DatabaseTransactionException {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, name, damage, package_id, user_uuid)" +
                 " VALUES (?, ?, ?, ?, ?)";
         val database = Database.getInstance();
@@ -76,7 +79,8 @@ public class CardRepository implements Repository<Card, UUID> {
      * @param user The user for whom to retrieve owned cards.
      * @return A list of Optional cards owned by the user.
      */
-    public List<Optional<Card>> findByOwner(User user) throws DatabaseTransactionException {
+    public List<Optional<Card>> findByOwner(User user)
+            throws DatabaseTransactionException {
         String query = "SELECT uuid, name, damage, package_id, user_uuid FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid = ?";
         val database = Database.getInstance();
@@ -94,7 +98,8 @@ public class CardRepository implements Repository<Card, UUID> {
      *
      * @return A list of Optional cards available in a package.
      */
-    public List<Optional<Card>> findAvailablePackage() throws DatabaseTransactionException {
+    public List<Optional<Card>> findAvailablePackage()
+            throws DatabaseTransactionException {
         String packageQuery = "WITH random_package AS (SELECT DISTINCT package_id FROM " + SCHEMA + TABLE +
                 " WHERE user_uuid IS NULL)";
         String query = packageQuery + " " + "SELECT uuid, name, damage, package_id, user_uuid FROM " + SCHEMA + TABLE +
@@ -115,7 +120,8 @@ public class CardRepository implements Repository<Card, UUID> {
      * @param card The card to be updated.
      * @param user The new owner of the card.
      */
-    public void updateOwner(Card card, User user) throws DatabaseTransactionException {
+    public void updateOwner(Card card, User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET user_uuid = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getUuid(), card.getUuid());
@@ -126,7 +132,8 @@ public class CardRepository implements Repository<Card, UUID> {
      *
      * @return The maximum package ID or null if no packages exist.
      */
-    public Integer findNextPackageId() throws DatabaseTransactionException {
+    public Integer findNextPackageId()
+            throws DatabaseTransactionException {
         String query = "SELECT MAX(package_id) as max FROM " + SCHEMA + TABLE;
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query);

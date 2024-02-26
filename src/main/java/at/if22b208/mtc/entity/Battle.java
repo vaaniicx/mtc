@@ -1,18 +1,18 @@
 package at.if22b208.mtc.entity;
 
-import at.if22b208.mtc.config.MtcConstants;
-import at.if22b208.mtc.entity.enumeration.AttackEffectiveness;
-import at.if22b208.mtc.entity.enumeration.CardElementType;
-import at.if22b208.mtc.entity.enumeration.CardType;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.IntStream;
+
+import at.if22b208.mtc.config.MtcConstants;
+import at.if22b208.mtc.entity.enumeration.AttackEffectiveness;
+import at.if22b208.mtc.entity.enumeration.CardElementType;
+import at.if22b208.mtc.entity.enumeration.CardType;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a battle between two players with decks of cards.
@@ -28,10 +28,15 @@ import java.util.stream.IntStream;
 @Slf4j
 public class Battle {
     private CountDownLatch latch = new CountDownLatch(2);
+
     private User playerA;
+
     private User playerB;
+
     private User winner;
+
     private boolean isDraw = false;
+
     private List<Round> rounds = new ArrayList<>();
 
     /**
@@ -56,7 +61,7 @@ public class Battle {
 
             Round round = createRound(i);
 
-            handleMonsterFight(round, cardA , cardB);
+            handleMonsterFight(round, cardA, cardB);
             handleSpellFight(round, cardA, cardB);
             handleMixedFight(round, cardA, cardB);
 
@@ -268,8 +273,8 @@ public class Battle {
      */
     private static void calculateAttacksBasedOnEffectiveness(AttackEffectiveness effectiveness, Card card) {
         switch (effectiveness) {
-            case EFFECTIVE -> card.setDamage(card.getDamage() * 2);
-            case NOT_EFFECTIVE -> card.setDamage(card.getDamage() / 2);
+        case EFFECTIVE -> card.setDamage(card.getDamage() * 2);
+        case NOT_EFFECTIVE -> card.setDamage(card.getDamage() / 2);
         }
     }
 

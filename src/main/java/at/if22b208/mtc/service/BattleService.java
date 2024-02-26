@@ -1,10 +1,10 @@
 package at.if22b208.mtc.service;
 
-import at.if22b208.mtc.entity.Battle;
-import at.if22b208.mtc.entity.User;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import at.if22b208.mtc.entity.Battle;
+import at.if22b208.mtc.entity.User;
 
 /**
  * The {@code BattleService} class manages the battle queue and facilitates the creation of battles between users.
@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class BattleService {
     private static BattleService INSTANCE;
+
     private final BlockingQueue<Battle> battles;
 
     private BattleService() {
@@ -30,7 +31,8 @@ public class BattleService {
      * @return The created or joined battle.
      * @throws InterruptedException If the thread is interrupted while waiting for a battle.
      */
-    public Battle enterBattleQueue(User user) throws InterruptedException {
+    public Battle enterBattleQueue(User user)
+            throws InterruptedException {
         if (battles.isEmpty()) {
             Battle battle = new Battle();
             battle.setPlayerA(user);

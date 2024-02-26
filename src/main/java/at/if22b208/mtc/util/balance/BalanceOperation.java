@@ -1,8 +1,8 @@
 package at.if22b208.mtc.util.balance;
 
-import at.if22b208.mtc.exception.NegativeBalanceException;
-
 import java.math.BigInteger;
+
+import at.if22b208.mtc.exception.NegativeBalanceException;
 
 /**
  * The {@code BalanceOperation} interface defines the contract for balance operations on {@link BigInteger} instances.
@@ -17,5 +17,6 @@ public interface BalanceOperation {
      * @return The result of the balance operation.
      * @throws NegativeBalanceException If the operation results in a negative balance.
      */
-    BigInteger operate(BigInteger a, BigInteger b) throws NegativeBalanceException;
+    BigInteger operate(BigInteger a, BigInteger b)
+            throws NegativeBalanceException;
 }

@@ -1,14 +1,15 @@
 package at.if22b208.mtc.util;
 
-import at.if22b208.mtc.exception.HashingException;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
+import at.if22b208.mtc.exception.HashingException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The {@code HashingUtils} class provides utility methods for hashing and generating salts.
@@ -43,7 +44,8 @@ public class HashingUtils {
      * @return The hashed value as a Base64-encoded string.
      * @throws HashingException If an error occurs during the hashing process.
      */
-    public static String hash(String plain, String salt) throws HashingException {
+    public static String hash(String plain, String salt)
+            throws HashingException {
         try {
             KeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), 65536, 128);
             SecretKeyFactory f = SecretKeyFactory.getInstance(ALGORITHM);

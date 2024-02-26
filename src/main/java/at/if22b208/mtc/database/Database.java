@@ -23,11 +23,17 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Database implements AutoCloseable {
     private static Database INSTANCE;
+
     private static final String DB_USER = "postgres";
+
     private static final String DB_PASSWORD = "admin";
+
     private static final String DB_HOST = "localhost";
+
     private static final String DB_PORT = "5432";
+
     private static final String DB_SCHEMA = "mtc";
+
     private Connection connection;
 
     private Database() {
@@ -63,7 +69,8 @@ public class Database implements AutoCloseable {
      * @param query  The SQL query to execute.
      * @param params Parameters to be used in the query.
      */
-    public void executeUpdateQuery(String query, Object... params) throws DatabaseTransactionException {
+    public void executeUpdateQuery(String query, Object... params)
+            throws DatabaseTransactionException {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
@@ -82,7 +89,8 @@ public class Database implements AutoCloseable {
      * @param params Parameters to be used in the query.
      * @return The UUID of the inserted row.
      */
-    public UUID executeInsertQuery(String query, Object... params) throws DatabaseTransactionException {
+    public UUID executeInsertQuery(String query, Object... params)
+            throws DatabaseTransactionException {
         try (PreparedStatement statement = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < params.length; i++) {
@@ -114,7 +122,8 @@ public class Database implements AutoCloseable {
      * @param params Parameters to be used in the query.
      * @return The result of the select query.
      */
-    public Result executeSelectQuery(String query, Object... params) throws DatabaseTransactionException {
+    public Result executeSelectQuery(String query, Object... params)
+            throws DatabaseTransactionException {
         Result result = Result.builder().build();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {

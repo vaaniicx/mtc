@@ -1,5 +1,7 @@
 package at.if22b208.mtc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.user.UserStatsDto;
 import at.if22b208.mtc.entity.User;
@@ -14,7 +16,6 @@ import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,7 +35,8 @@ public class StatisticController implements Controller {
      * @param username The username for which to retrieve statistics.
      * @return Response containing user statistics in JSON format.
      */
-    private Response getStats(String username) throws DatabaseTransactionException {
+    private Response getStats(String username)
+            throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         UserStatsDto dto = UserMapper.INSTANCE.mapToUserStatsDto(user);
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(dto));
@@ -48,7 +50,8 @@ public class StatisticController implements Controller {
      * @throws JsonProcessingException if there is an issue processing JSON.
      */
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request)
+            throws JsonProcessingException {
         String root = request.getRoot();
 
         Transaction transaction = new Transaction();

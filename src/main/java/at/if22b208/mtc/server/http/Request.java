@@ -1,19 +1,25 @@
 package at.if22b208.mtc.server.http;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class Request {
 
     private Method method;
+
     private String urlContent;
+
     private String pathname;
+
     private List<String> pathParts;
+
     private String params;
+
     private Header header = new Header();
+
     private String body;
 
     public String getServiceRoute() {

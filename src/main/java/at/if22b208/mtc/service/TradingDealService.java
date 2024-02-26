@@ -17,7 +17,8 @@ public class TradingDealService implements Service<TradingDeal, UUID> {
     }
 
     @Override
-    public TradingDeal create(TradingDeal deal) throws InvalidTradingDealException, DatabaseTransactionException {
+    public TradingDeal create(TradingDeal deal)
+            throws InvalidTradingDealException, DatabaseTransactionException {
         if (this.getById(deal.getUuid()) != null) {
             throw new InvalidTradingDealException("Trading deal already exists.");
         }
@@ -25,7 +26,8 @@ public class TradingDealService implements Service<TradingDeal, UUID> {
     }
 
     @Override
-    public List<TradingDeal> getAll() throws DatabaseTransactionException {
+    public List<TradingDeal> getAll()
+            throws DatabaseTransactionException {
         List<Optional<TradingDeal>> all = TradingDealRepository.getInstance().findAll();
         return all.stream()
                 .map(deal -> deal.orElse(null))
@@ -33,13 +35,15 @@ public class TradingDealService implements Service<TradingDeal, UUID> {
     }
 
     @Override
-    public TradingDeal getById(UUID uuid) throws DatabaseTransactionException {
+    public TradingDeal getById(UUID uuid)
+            throws DatabaseTransactionException {
         return TradingDealRepository.getInstance()
                 .findById(uuid)
                 .orElse(null);
     }
 
-    public void deleteById(UUID uuid) throws DatabaseTransactionException {
+    public void deleteById(UUID uuid)
+            throws DatabaseTransactionException {
         TradingDealRepository.getInstance().delete(uuid);
     }
 

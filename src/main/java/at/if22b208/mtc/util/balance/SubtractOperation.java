@@ -1,8 +1,8 @@
 package at.if22b208.mtc.util.balance;
 
-import at.if22b208.mtc.exception.NegativeBalanceException;
-
 import java.math.BigInteger;
+
+import at.if22b208.mtc.exception.NegativeBalanceException;
 
 /**
  * The {@code SubtractOperation} class implements the {@link BalanceOperation} interface
@@ -19,7 +19,8 @@ public class SubtractOperation implements BalanceOperation {
      * @throws NegativeBalanceException If the operation results in a negative balance.
      */
     @Override
-    public BigInteger operate(BigInteger a, BigInteger b) throws NegativeBalanceException {
+    public BigInteger operate(BigInteger a, BigInteger b)
+            throws NegativeBalanceException {
         if (a.subtract(b).compareTo(BigInteger.ZERO) < 0) {
             throw new NegativeBalanceException("Transaction would result in a balance less than zero.");
         }

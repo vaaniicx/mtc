@@ -29,7 +29,8 @@ public interface Repository<E, T> {
      *
      * @return A list of optional entities in the database.
      */
-    List<Optional<E>> findAll() throws DatabaseTransactionException;
+    List<Optional<E>> findAll()
+            throws DatabaseTransactionException;
 
     /**
      * Finds an entity by its identifier in the database.
@@ -37,7 +38,8 @@ public interface Repository<E, T> {
      * @param t The identifier of the entity to find.
      * @return An Optional containing the found entity, or an empty Optional if not found.
      */
-    Optional<E> findById(T t) throws DatabaseTransactionException;
+    Optional<E> findById(T t)
+            throws DatabaseTransactionException;
 
     /**
      * Creates a new entity in the database.
@@ -45,5 +47,6 @@ public interface Repository<E, T> {
      * @param e The entity to be created.
      * @return The created entity.
      */
-    E create(E e) throws DatabaseTransactionException;
+    E create(E e)
+            throws DatabaseTransactionException;
 }

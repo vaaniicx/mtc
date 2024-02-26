@@ -42,7 +42,8 @@ public class TransactionController implements Controller {
      * @param username The username of the user acquiring the package.
      * @return A {@link Response} indicating the result of the package acquisition.
      */
-    private Response acquirePackage(String username) throws DatabaseTransactionException {
+    private Response acquirePackage(String username)
+            throws DatabaseTransactionException {
         try {
             User user = UserService.getInstance().getByUsername(username); // Get the user associated with the username
             if (user == null) {
@@ -51,7 +52,7 @@ public class TransactionController implements Controller {
 
             // Update the user's balance by subtracting the package cost
             UserService.getInstance()
-                       .updateBalance(user, MtcConstants.PACKAGE_COST, new SubtractOperation());
+                    .updateBalance(user, MtcConstants.PACKAGE_COST, new SubtractOperation());
 
             CardService cardService = CardService.getInstance();
 
@@ -62,8 +63,8 @@ public class TransactionController implements Controller {
             }
 
             List<CardDto> dtoList = pack.stream()
-                                        .map(CardMapper.INSTANCE::map)
-                                        .toList();
+                    .map(CardMapper.INSTANCE::map)
+                    .toList();
             return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtoList.toArray()));
         } catch (BalanceTransactionException e) {
             return ResponseUtils.forbidden(MessageConstants.INSUFFICIENT_FUNDS);

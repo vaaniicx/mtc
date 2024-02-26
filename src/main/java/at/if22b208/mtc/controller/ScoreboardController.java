@@ -3,6 +3,8 @@ package at.if22b208.mtc.controller;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.user.UserStatsDto;
 import at.if22b208.mtc.entity.User;
@@ -17,7 +19,6 @@ import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.UserMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,12 +37,13 @@ public class ScoreboardController implements Controller {
      *
      * @return Response containing the scoreboard in JSON format.
      */
-    private Response getScoreboard() throws DatabaseTransactionException {
+    private Response getScoreboard()
+            throws DatabaseTransactionException {
         List<User> users = UserService.getInstance().getAll();
         List<UserStatsDto> dtos = users.stream()
-                                       .map(UserMapper.INSTANCE::mapToUserStatsDto)
-                                       .sorted(Comparator.comparing(UserStatsDto::elo).reversed())
-                                       .toList();
+                .map(UserMapper.INSTANCE::mapToUserStatsDto)
+                .sorted(Comparator.comparing(UserStatsDto::elo).reversed())
+                .toList();
         return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(dtos.toArray()));
     }
 
@@ -53,7 +55,8 @@ public class ScoreboardController implements Controller {
      * @throws JsonProcessingException if there is an issue processing JSON.
      */
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request)
+            throws JsonProcessingException {
         // Check if the request is authorized
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();

@@ -38,7 +38,8 @@ public class CardService implements Service<Card, UUID> {
      * @throws InvalidPackageException If the card already exists.
      */
     @Override
-    public Card create(Card card) throws InvalidPackageException, DatabaseTransactionException {
+    public Card create(Card card)
+            throws InvalidPackageException, DatabaseTransactionException {
         if (this.getById(card.getUuid()) != null) {
             throw new InvalidPackageException("Card already exists.");
         }
@@ -62,7 +63,8 @@ public class CardService implements Service<Card, UUID> {
      * @return The card with the specified UUID, or {@code null} if not found.
      */
     @Override
-    public Card getById(UUID uuid) throws DatabaseTransactionException {
+    public Card getById(UUID uuid)
+            throws DatabaseTransactionException {
         return CardRepository.getInstance()
                 .findById(uuid)
                 .orElse(null);
@@ -74,7 +76,8 @@ public class CardService implements Service<Card, UUID> {
      * @param user The user whose cards need to be retrieved.
      * @return A list of cards owned by the specified user.
      */
-    public List<Card> getAllByOwner(User user) throws DatabaseTransactionException {
+    public List<Card> getAllByOwner(User user)
+            throws DatabaseTransactionException {
         return CardRepository.getInstance()
                 .findByOwner(user)
                 .stream()
@@ -87,7 +90,8 @@ public class CardService implements Service<Card, UUID> {
      *
      * @return The next available package ID.
      */
-    public int getNextPackageId() throws DatabaseTransactionException {
+    public int getNextPackageId()
+            throws DatabaseTransactionException {
         Integer nextPackageId = CardRepository.getInstance().findNextPackageId();
         if (nextPackageId == null) {
             return 1;
@@ -102,7 +106,8 @@ public class CardService implements Service<Card, UUID> {
      * @return A list of cards representing the package.
      * @throws InvalidPackageException If the package size is not as expected.
      */
-    public List<Card> getPackage() throws InvalidPackageException, DatabaseTransactionException {
+    public List<Card> getPackage()
+            throws InvalidPackageException, DatabaseTransactionException {
         List<Card> cards = CardRepository.getInstance().findAvailablePackage()
                 .stream()
                 .flatMap(Optional::stream)
@@ -121,7 +126,8 @@ public class CardService implements Service<Card, UUID> {
      * @param card The card whose owner needs to be updated.
      * @param user The new owner of the card.
      */
-    public void updateOwner(Card card, User user) throws DatabaseTransactionException {
+    public void updateOwner(Card card, User user)
+            throws DatabaseTransactionException {
         CardRepository.getInstance().updateOwner(card, user);
     }
 

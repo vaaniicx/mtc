@@ -1,10 +1,10 @@
 package at.if22b208.mtc.database;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * Result class representing the outcome of a database query.

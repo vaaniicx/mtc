@@ -3,6 +3,8 @@ package at.if22b208.mtc.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import at.if22b208.mtc.config.MessageConstants;
 import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.dto.trading.TradingDealDto;
@@ -22,7 +24,6 @@ import at.if22b208.mtc.util.JsonUtils;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
 import at.if22b208.mtc.util.mapper.TradingDealMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,7 +39,8 @@ public class TradingController implements Controller {
      * @return A response containing a list of trading deals in JSON format, or a no-content response if no deals are
      * available.
      */
-    private Response getTradingDeals() throws DatabaseTransactionException {
+    private Response getTradingDeals()
+            throws DatabaseTransactionException {
         List<TradingDeal> deals = TradingDealService.getInstance().getAll();
         if (!deals.isEmpty()) {
             return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromArray(deals.toArray()));
@@ -54,7 +56,8 @@ public class TradingController implements Controller {
      * @param dto  The trading deal data transfer object.
      * @return A response indicating the success or failure of the trading deal creation.
      */
-    private Response createTradingDeal(User user, TradingDealDto dto) throws DatabaseTransactionException {
+    private Response createTradingDeal(User user, TradingDealDto dto)
+            throws DatabaseTransactionException {
         Card tradingCard = CardService.getInstance().getById(dto.getCardUuid());
 
         // Can only create a deal for a card that is owned by the requesting user or card is not in deck
@@ -78,7 +81,8 @@ public class TradingController implements Controller {
      * @param dealUuid The UUID of the trading deal to be deleted.
      * @return A response indicating the success or failure of the trading deal deletion.
      */
-    private Response deleteTradingDeal(User user, UUID dealUuid) throws DatabaseTransactionException {
+    private Response deleteTradingDeal(User user, UUID dealUuid)
+            throws DatabaseTransactionException {
         TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
         if (deal == null) {
             return ResponseUtils.notFound(MessageConstants.TRADING_DEAL_NOT_FOUND);
@@ -104,7 +108,8 @@ public class TradingController implements Controller {
      * @param cardUuid The UUID of the card offered by the user to complete the deal.
      * @return A response indicating the success or failure of carrying out the trading deal.
      */
-    private Response carryOutDeal(User user, UUID dealUuid, UUID cardUuid) throws DatabaseTransactionException {
+    private Response carryOutDeal(User user, UUID dealUuid, UUID cardUuid)
+            throws DatabaseTransactionException {
         TradingDeal deal = TradingDealService.getInstance().getById(dealUuid);
         if (deal == null) {
             return ResponseUtils.notFound(MessageConstants.TRADING_DEAL_NOT_FOUND);
@@ -114,7 +119,7 @@ public class TradingController implements Controller {
 
         // Can only delete a deal for a card that is owned by the requesting user
         if (offeredCard == null || isUserFromDeal(user, deal) || !hasCardOwned(user, offeredCard)
-            || hasCardLocked(user, offeredCard) || !hasTradingRequirements(deal, offeredCard)) {
+                || hasCardLocked(user, offeredCard) || !hasTradingRequirements(deal, offeredCard)) {
             return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARRY_OUT_FAILURE);
         }
 
@@ -148,7 +153,7 @@ public class TradingController implements Controller {
      */
     private boolean hasCardLocked(User user, Card card) {
         return user.getDeck().stream()
-                   .anyMatch(c -> c.getUuid().equals(card.getUuid()));
+                .anyMatch(c -> c.getUuid().equals(card.getUuid()));
     }
 
     /**
@@ -160,7 +165,7 @@ public class TradingController implements Controller {
      */
     private boolean hasTradingRequirements(TradingDeal deal, Card offeredCard) {
         return deal.getCardType().equals(offeredCard.getCardType())
-               && deal.getMinimumDamage() <= offeredCard.getDamage();
+                && deal.getMinimumDamage() <= offeredCard.getDamage();
     }
 
     /**
@@ -170,9 +175,10 @@ public class TradingController implements Controller {
      * @param deal The trading deal containing the card UUID.
      * @return True if the user is the owner, false otherwise.
      */
-    private boolean isUserFromDeal(User user, TradingDeal deal) throws DatabaseTransactionException {
+    private boolean isUserFromDeal(User user, TradingDeal deal)
+            throws DatabaseTransactionException {
         return user.getUuid().equals(CardService.getInstance().getById(deal.getCardUuid())
-                                                .getUserUuid());
+                .getUserUuid());
     }
 
     /**
@@ -184,11 +190,11 @@ public class TradingController implements Controller {
      * @throws JsonProcessingException If there is an error processing JSON data.
      */
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request)
+            throws JsonProcessingException {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }
-
 
         Transaction transaction = new Transaction();
         try {
@@ -203,19 +209,19 @@ public class TradingController implements Controller {
             if (root.equalsIgnoreCase("tradings")) {
                 if (request.getPathParts().size() == 1) {
                     switch (request.getMethod()) {
-                        case GET -> {
-                            Response response = getTradingDeals();
-                            transaction.commit();
+                    case GET -> {
+                        Response response = getTradingDeals();
+                        transaction.commit();
 
-                            return response;
+                        return response;
+                    }
+                    case POST -> {
+                        String body = request.getBody().toLowerCase();
+                        TradingDealDto dealDto = JsonUtils.getObjectFromJsonString(body, TradingDealDto.class);
+                        if (dealDto != null) {
+                            return createTradingDeal(user, dealDto);
                         }
-                        case POST -> {
-                            String body = request.getBody().toLowerCase();
-                            TradingDealDto dealDto = JsonUtils.getObjectFromJsonString(body, TradingDealDto.class);
-                            if (dealDto != null) {
-                                return createTradingDeal(user, dealDto);
-                            }
-                        }
+                    }
                     }
                 }
 
@@ -223,14 +229,14 @@ public class TradingController implements Controller {
                     UUID dealUuid = UUID.fromString(request.getPathParts().get(1));
 
                     switch (request.getMethod()) {
-                        case POST -> {
-                            String body = request.getBody().toLowerCase();
-                            UUID cardUuid = JsonUtils.getObjectFromJsonString(body, UUID.class);
-                            return carryOutDeal(user, dealUuid, cardUuid);
-                        }
-                        case DELETE -> {
-                            return deleteTradingDeal(user, dealUuid);
-                        }
+                    case POST -> {
+                        String body = request.getBody().toLowerCase();
+                        UUID cardUuid = JsonUtils.getObjectFromJsonString(body, UUID.class);
+                        return carryOutDeal(user, dealUuid, cardUuid);
+                    }
+                    case DELETE -> {
+                        return deleteTradingDeal(user, dealUuid);
+                    }
                     }
                 }
             }

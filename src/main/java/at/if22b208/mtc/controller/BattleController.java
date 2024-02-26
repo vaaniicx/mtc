@@ -1,5 +1,7 @@
 package at.if22b208.mtc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import at.if22b208.mtc.config.MessageConstants;
 import at.if22b208.mtc.database.Transaction;
 import at.if22b208.mtc.entity.Battle;
@@ -15,7 +17,6 @@ import at.if22b208.mtc.service.UserService;
 import at.if22b208.mtc.util.EloSystem;
 import at.if22b208.mtc.util.ResponseUtils;
 import at.if22b208.mtc.util.SessionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,7 +36,8 @@ public class BattleController implements Controller {
      * @param user The user waiting for the battle.
      * @return Response indicating the outcome of the battle.
      */
-    private Response waitForBattleToBeReady(User user) throws DatabaseTransactionException {
+    private Response waitForBattleToBeReady(User user)
+            throws DatabaseTransactionException {
         try {
             Battle battle = BattleService.getInstance().enterBattleQueue(user);
 
@@ -54,7 +56,8 @@ public class BattleController implements Controller {
             updateUserStatisticData(playerB);
 
             int roundsPlayed = battle.getRounds().size();
-            return ResponseUtils.ok(ContentType.PLAIN_TEXT, "Rounds played: " + roundsPlayed + ", Winner is: " + battle.getWinner().getUsername());
+            return ResponseUtils.ok(ContentType.PLAIN_TEXT,
+                    "Rounds played: " + roundsPlayed + ", Winner is: " + battle.getWinner().getUsername());
         } catch (InterruptedException e) {
             return ResponseUtils.error(":D"); // Handle InterruptedException with an error response.
         }
@@ -75,7 +78,8 @@ public class BattleController implements Controller {
      *
      * @param user The User object representing the player.
      */
-    private static void updateUserStatisticData(User user) throws DatabaseTransactionException {
+    private static void updateUserStatisticData(User user)
+            throws DatabaseTransactionException {
         UserService.getInstance().updateElo(user);
     }
 
@@ -87,7 +91,8 @@ public class BattleController implements Controller {
      * @throws JsonProcessingException If JSON processing error occurs.
      */
     @Override
-    public Response handleRequest(Request request) throws JsonProcessingException {
+    public Response handleRequest(Request request)
+            throws JsonProcessingException {
         if (!SessionUtils.isAuthorized(request.getHeader())) {
             return ResponseUtils.unauthorized();
         }

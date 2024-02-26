@@ -5,7 +5,9 @@ import java.util.Map;
 
 public class Header {
     public static final String CONTENT_LENGTH_HEADER = "Content-Length";
+
     public static final String HEADER_NAME_VALUE_SEPARATOR = ":";
+
     private final Map<String, String> headers = new HashMap<>();
 
     public void ingest(String headerLine) {

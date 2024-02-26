@@ -24,7 +24,8 @@ public class UserService implements Service<User, UUID> {
         // Private constructor to ensure singleton pattern.
     }
 
-    public List<User> getAll() throws DatabaseTransactionException {
+    public List<User> getAll()
+            throws DatabaseTransactionException {
         List<Optional<User>> all = UserRepository.getInstance().findAll();
         return all.stream()
                 .map(user -> user.orElse(null))
@@ -32,20 +33,23 @@ public class UserService implements Service<User, UUID> {
     }
 
     @Override
-    public User getById(UUID uuid) throws DatabaseTransactionException {
+    public User getById(UUID uuid)
+            throws DatabaseTransactionException {
         return UserRepository.getInstance()
                 .findById(uuid)
                 .orElse(null);
     }
 
-    public User getByUsername(String username) throws DatabaseTransactionException {
+    public User getByUsername(String username)
+            throws DatabaseTransactionException {
         return UserRepository.getInstance()
                 .findByUsername(username)
                 .orElse(null);
     }
 
     @Override
-    public User create(User user) throws DatabaseTransactionException {
+    public User create(User user)
+            throws DatabaseTransactionException {
         if (getByUsername(user.getUsername()) != null) {
             return null;
         }
@@ -60,7 +64,8 @@ public class UserService implements Service<User, UUID> {
      * @param amount    The amount to update the balance by.
      * @param operation The operation to perform on the balance.
      */
-    public void updateBalance(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+    public void updateBalance(User user, BigInteger amount, BalanceOperation operation)
+            throws BalanceTransactionException {
         try {
             BigInteger newBalance = operation.operate(user.getBalance(), amount);
             user.setBalance(newBalance);
@@ -71,11 +76,13 @@ public class UserService implements Service<User, UUID> {
         }
     }
 
-    public void updateElo(User user) throws DatabaseTransactionException {
+    public void updateElo(User user)
+            throws DatabaseTransactionException {
         UserRepository.getInstance().updateElo(user);
     }
 
-    public void updateLoss(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+    public void updateLoss(User user, BigInteger amount, BalanceOperation operation)
+            throws BalanceTransactionException {
         try {
             BigInteger newLosses = operation.operate(BigInteger.valueOf(user.getLosses()), amount);
             user.setLosses(newLosses.intValue());
@@ -86,7 +93,8 @@ public class UserService implements Service<User, UUID> {
         }
     }
 
-    public void updateWin(User user, BigInteger amount, BalanceOperation operation) throws BalanceTransactionException {
+    public void updateWin(User user, BigInteger amount, BalanceOperation operation)
+            throws BalanceTransactionException {
         try {
             BigInteger newWins = operation.operate(BigInteger.valueOf(user.getWins()), amount);
             user.setWins(newWins.intValue());
@@ -97,16 +105,19 @@ public class UserService implements Service<User, UUID> {
         }
     }
 
-    public List<Card> getDeckByOwner(User user) throws DatabaseTransactionException {
+    public List<Card> getDeckByOwner(User user)
+            throws DatabaseTransactionException {
         Optional<User> optional = UserRepository.getInstance().findByUsername(user.getUsername());
         return optional.map(User::getDeck).orElse(new ArrayList<>());
     }
 
-    public void updateDeck(User user) throws DatabaseTransactionException {
+    public void updateDeck(User user)
+            throws DatabaseTransactionException {
         UserRepository.getInstance().updateDeck(user);
     }
 
-    public void updateUserData(User user) throws NameNotValidException, DatabaseTransactionException {
+    public void updateUserData(User user)
+            throws NameNotValidException, DatabaseTransactionException {
         if (!user.getName().startsWith(user.getUsername())) {
             throw new NameNotValidException("Name does not start with username.");
         }

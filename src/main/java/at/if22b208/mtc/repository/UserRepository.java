@@ -28,6 +28,7 @@ import lombok.val;
 @Slf4j
 public class UserRepository implements Repository<User, UUID> {
     private static UserRepository INSTANCE;
+
     private static final String TABLE = "user";
 
     private UserRepository() {
@@ -39,9 +40,10 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @return A list of all users in the database.
      */
-    public List<Optional<User>> findAll() throws DatabaseTransactionException {
+    public List<Optional<User>> findAll()
+            throws DatabaseTransactionException {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses " +
-                       "FROM " + SCHEMA + TABLE;
+                "FROM " + SCHEMA + TABLE;
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query);
 
@@ -59,9 +61,10 @@ public class UserRepository implements Repository<User, UUID> {
      * @return An Optional containing the found user, or an empty Optional if not found.
      */
     @Override
-    public Optional<User> findById(UUID uuid) throws DatabaseTransactionException {
+    public Optional<User> findById(UUID uuid)
+            throws DatabaseTransactionException {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses " +
-                       "FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
+                "FROM " + SCHEMA + TABLE + " WHERE uuid = ?";
         val database = Database.getInstance();
         Result result = database.executeSelectQuery(query, uuid);
 
@@ -77,9 +80,10 @@ public class UserRepository implements Repository<User, UUID> {
      * @param username The username of the user to find.
      * @return An Optional containing the found user, or an empty Optional if not found.
      */
-    public Optional<User> findByUsername(String username) throws DatabaseTransactionException {
+    public Optional<User> findByUsername(String username)
+            throws DatabaseTransactionException {
         String query = "SELECT uuid, username, password, balance, deck, name, biography, image, elo, wins, losses FROM "
-                       + SCHEMA + TABLE + " WHERE username = ?";
+                + SCHEMA + TABLE + " WHERE username = ?";
         val database = Database.getInstance();
         val result = database.executeSelectQuery(query, username);
 
@@ -97,9 +101,10 @@ public class UserRepository implements Repository<User, UUID> {
      * @return The created user with its UUID set.
      */
     @Override
-    public User create(User user) throws DatabaseTransactionException {
+    public User create(User user)
+            throws DatabaseTransactionException {
         String query = "INSERT INTO " + SCHEMA + TABLE + " (uuid, username, password, balance) VALUES " +
-                       "((" + GENERATE_UUID_SEQUENCE_STRING + "), ?, ?, ?)";
+                "((" + GENERATE_UUID_SEQUENCE_STRING + "), ?, ?, ?)";
         val database = Database.getInstance();
         UUID uuid = database.executeInsertQuery(query, user.getUsername(), user.getPassword(), user.getBalance());
         return user.withUuid(uuid);
@@ -110,7 +115,8 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @param user The user whose data needs to be updated.
      */
-    public void updateUserData(User user) throws DatabaseTransactionException {
+    public void updateUserData(User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET name = ?, biography = ?, image = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getName(), user.getBiography(), user.getImage(), user.getUuid());
@@ -121,7 +127,8 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @param user The user whose balance needs to be updated.
      */
-    public void updateBalance(User user) throws DatabaseTransactionException {
+    public void updateBalance(User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET balance = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getBalance(), user.getUuid());
@@ -132,7 +139,8 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @param user The user whose ELO rating needs to be updated.
      */
-    public void updateElo(User user) throws DatabaseTransactionException {
+    public void updateElo(User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET elo = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getElo(), user.getUuid());
@@ -143,7 +151,8 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @param user The user whose losses count needs to be updated.
      */
-    public void updateLoss(User user) throws DatabaseTransactionException {
+    public void updateLoss(User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET losses = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getLosses(), user.getUuid());
@@ -154,7 +163,8 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @param user The user whose wins count needs to be updated.
      */
-    public void updateWin(User user) throws DatabaseTransactionException {
+    public void updateWin(User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET wins = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query, user.getWins(), user.getUuid());
@@ -165,12 +175,13 @@ public class UserRepository implements Repository<User, UUID> {
      *
      * @param user The user whose deck needs to be updated.
      */
-    public void updateDeck(User user) throws DatabaseTransactionException {
+    public void updateDeck(User user)
+            throws DatabaseTransactionException {
         String query = "UPDATE " + SCHEMA + TABLE + " SET deck = ? WHERE uuid = ?";
         val database = Database.getInstance();
         database.executeUpdateQuery(query,
-                                    JsonUtils.getJsonStringFromArray(
-                                        user.getDeck().stream().map(Card::getUuid).toArray()), user.getUuid());
+                JsonUtils.getJsonStringFromArray(
+                        user.getDeck().stream().map(Card::getUuid).toArray()), user.getUuid());
     }
 
     /**
@@ -179,26 +190,28 @@ public class UserRepository implements Repository<User, UUID> {
      * @param row The database row containing user data.
      * @return A User entity built from the database row.
      */
-    private User buildUserFromRow(Row row) throws DatabaseTransactionException {
+    private User buildUserFromRow(Row row)
+            throws DatabaseTransactionException {
         return User.builder()
-                   .uuid(row.getUuid("uuid"))
-                   .username(row.getString("username"))
-                   .password(row.getString("password"))
-                   .balance(BigInteger.valueOf(row.getLong("balance")))
-                   .deck(row.getString("deck") == null ?
-                         new ArrayList<>() :
-                         getDeckFromRow(row)
-                        )
-                   .name(row.getString("name"))
-                   .biography(row.getString("biography"))
-                   .image(row.getString("image"))
-                   .elo(row.getInt("elo"))
-                   .wins(row.getInt("wins"))
-                   .losses(row.getInt("losses"))
-                   .build();
+                .uuid(row.getUuid("uuid"))
+                .username(row.getString("username"))
+                .password(row.getString("password"))
+                .balance(BigInteger.valueOf(row.getLong("balance")))
+                .deck(row.getString("deck") == null ?
+                        new ArrayList<>() :
+                        getDeckFromRow(row)
+                )
+                .name(row.getString("name"))
+                .biography(row.getString("biography"))
+                .image(row.getString("image"))
+                .elo(row.getInt("elo"))
+                .wins(row.getInt("wins"))
+                .losses(row.getInt("losses"))
+                .build();
     }
 
-    private static List<Card> getDeckFromRow(Row row) throws DatabaseTransactionException {
+    private static List<Card> getDeckFromRow(Row row)
+            throws DatabaseTransactionException {
         List<Card> cards = new ArrayList<>();
         List<UUID> deck = JsonUtils.getListFromJsonString(row.getString("deck"), UUID.class);
         for (UUID uuid : deck) {

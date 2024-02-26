@@ -40,7 +40,7 @@ public class UserController implements Controller {
      * @throws HashingException If an error occurs during password hashing.
      */
     private Response createUserWithCredentials(UserCredentialsDto dto)
-        throws HashingException, DatabaseTransactionException {
+            throws HashingException, DatabaseTransactionException {
         User user = User.builder()
                 .username(dto.getUsername())
                 .password(HashingUtils.hash(dto.getPassword(), HashingUtils.generateSalt(dto.getUsername())))
@@ -60,7 +60,8 @@ public class UserController implements Controller {
      * @param dto      The user data DTO containing updated information.
      * @return Response indicating the success or failure of the user data update.
      */
-    private Response updateUserData(String username, UserDataDto dto) throws DatabaseTransactionException {
+    private Response updateUserData(String username, UserDataDto dto)
+            throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -83,7 +84,8 @@ public class UserController implements Controller {
      * @param username The username of the user to retrieve.
      * @return Response containing user information in JSON format.
      */
-    private Response getUserByUsername(String username) throws DatabaseTransactionException {
+    private Response getUserByUsername(String username)
+            throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);

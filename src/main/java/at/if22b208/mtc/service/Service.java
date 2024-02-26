@@ -18,17 +18,19 @@ public interface Service<E, T> {
      *
      * @param e The entity to be created.
      * @return The created entity.
-     * @throws InvalidPackageException      If there is an issue with the entity creation (specific to the application context).
-     * @throws InvalidTradingDealException  If there is an issue with the entity creation (specific to the application context).
+     * @throws InvalidPackageException     If there is an issue with the entity creation (specific to the application context).
+     * @throws InvalidTradingDealException If there is an issue with the entity creation (specific to the application context).
      */
-    E create(E e) throws InvalidPackageException, InvalidTradingDealException, DatabaseTransactionException;
+    E create(E e)
+            throws InvalidPackageException, InvalidTradingDealException, DatabaseTransactionException;
 
     /**
      * Retrieves a list of all entities in the system.
      *
      * @return A list of all entities in the system.
      */
-    List<E> getAll() throws DatabaseTransactionException;
+    List<E> getAll()
+            throws DatabaseTransactionException;
 
     /**
      * Retrieves an entity by its identifier from the system.
@@ -36,5 +38,6 @@ public interface Service<E, T> {
      * @param t The identifier of the entity to retrieve.
      * @return The entity with the specified identifier, or {@code null} if not found.
      */
-    E getById(T t) throws DatabaseTransactionException;
+    E getById(T t)
+            throws DatabaseTransactionException;
 }

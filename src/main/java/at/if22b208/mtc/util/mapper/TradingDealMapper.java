@@ -1,9 +1,10 @@
 package at.if22b208.mtc.util.mapper;
 
-import at.if22b208.mtc.dto.trading.TradingDealDto;
-import at.if22b208.mtc.entity.TradingDeal;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import at.if22b208.mtc.dto.trading.TradingDealDto;
+import at.if22b208.mtc.entity.TradingDeal;
 
 /**
  * The {@code TradingDealMapper} interface is used with MapStruct to automatically generate

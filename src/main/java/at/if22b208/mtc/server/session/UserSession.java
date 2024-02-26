@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class UserSession {
     private final String username;
+
     private final long startTime;
 }

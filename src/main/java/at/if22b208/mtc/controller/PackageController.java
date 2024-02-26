@@ -38,7 +38,8 @@ public class PackageController implements Controller {
      * @param cardDtoList The list of card DTOs to be included in the package.
      * @return A response indicating the success or failure of the package creation.
      */
-    private Response createPackage(List<CardDto> cardDtoList) throws DatabaseTransactionException {
+    private Response createPackage(List<CardDto> cardDtoList)
+            throws DatabaseTransactionException {
         int packageId = CardService.getInstance().getNextPackageId();
 
         for (CardDto dto : cardDtoList) {

@@ -20,7 +20,8 @@ public class Transaction {
         }
     }
 
-    public void commit() throws DatabaseTransactionException {
+    public void commit()
+            throws DatabaseTransactionException {
         if (this.connection != null) {
             try {
                 this.connection.commit();
@@ -31,7 +32,8 @@ public class Transaction {
 
     }
 
-    public void rollback() throws DatabaseTransactionException {
+    public void rollback()
+            throws DatabaseTransactionException {
         if (this.connection != null) {
             try {
                 this.connection.rollback();

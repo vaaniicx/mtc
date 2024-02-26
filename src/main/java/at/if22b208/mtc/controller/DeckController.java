@@ -43,7 +43,8 @@ public class DeckController implements Controller {
      * @param type     The type of deck format (e.g., "format=plain").
      * @return Response containing the deck information in the specified format.
      */
-    private Response getDeck(String username, String type) throws DatabaseTransactionException {
+    private Response getDeck(String username, String type)
+            throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -71,7 +72,8 @@ public class DeckController implements Controller {
      * @param uuids    List of UUIDs representing the cards to include in the deck.
      * @return Response indicating the success or failure of the deck configuration.
      */
-    private Response configureDeck(String username, List<UUID> uuids) throws DatabaseTransactionException {
+    private Response configureDeck(String username, List<UUID> uuids)
+            throws DatabaseTransactionException {
         User user = UserService.getInstance().getByUsername(username);
         if (user == null) {
             return ResponseUtils.notFound(MessageConstants.USER_NOT_FOUND);
@@ -111,7 +113,8 @@ public class DeckController implements Controller {
      * @param uuids List of UUIDs representing the cards to check.
      * @return True if any of the cards are locked in a trading deal; otherwise, false.
      */
-    private boolean hasCardLockedInTradingDeal(List<UUID> uuids) throws DatabaseTransactionException {
+    private boolean hasCardLockedInTradingDeal(List<UUID> uuids)
+            throws DatabaseTransactionException {
         List<TradingDeal> deals = TradingDealService.getInstance().getAll();
         return deals.stream()
                 .map(TradingDeal::getCardUuid)
@@ -136,14 +139,14 @@ public class DeckController implements Controller {
         try {
             if ("deck".equals(root)) {
                 switch (request.getMethod()) {
-                    case GET -> {
-                        response = getDeck(username, request.getParams());
-                        transaction.commit();
-                    }
-                    case PUT -> {
-                        response = configureDeck(username, JsonUtils.getListFromJsonString(request.getBody(), UUID.class));
-                        transaction.commit();
-                    }
+                case GET -> {
+                    response = getDeck(username, request.getParams());
+                    transaction.commit();
+                }
+                case PUT -> {
+                    response = configureDeck(username, JsonUtils.getListFromJsonString(request.getBody(), UUID.class));
+                    transaction.commit();
+                }
                 }
             }
         } catch (DatabaseTransactionException e) {

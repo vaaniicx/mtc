@@ -1,18 +1,19 @@
 package at.if22b208.mtc.server;
 
-import at.if22b208.mtc.server.util.RequestHandler;
-import at.if22b208.mtc.server.util.Router;
-import lombok.AllArgsConstructor;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import at.if22b208.mtc.server.util.RequestHandler;
+import at.if22b208.mtc.server.util.Router;
+import lombok.AllArgsConstructor;
+
 @AllArgsConstructor
 public class Server {
     private int port;
+
     private Router router;
 
     public void start() {

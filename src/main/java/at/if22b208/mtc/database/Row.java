@@ -1,10 +1,10 @@
 package at.if22b208.mtc.database;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import lombok.Getter;
 
 /**
  * Row class representing a single row of data retrieved from a database query.

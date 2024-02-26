@@ -37,17 +37,18 @@ public class SessionController implements Controller {
      * @param credentialsDto The {@link UserCredentialsDto} containing username and password.
      * @return A {@link Response} object representing the result of the login attempt.
      */
-    private Response login(UserCredentialsDto credentialsDto) throws DatabaseTransactionException {
+    private Response login(UserCredentialsDto credentialsDto)
+            throws DatabaseTransactionException {
         try {
             // Hash the provided password
             String hash = HashingUtils.hash(credentialsDto.getPassword(),
-                                            HashingUtils.generateSalt(credentialsDto.getUsername()));
+                    HashingUtils.generateSalt(credentialsDto.getUsername()));
             // Retrieve the user by username
             User user = UserService.getInstance().getByUsername(credentialsDto.getUsername());
             if (user != null) {
                 // Check if the user exists and if the provided username and password match
                 if (Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(
-                    user.getPassword(), hash)) {
+                        user.getPassword(), hash)) {
                     // Successful login
                     String token = SessionManager.createSession(user.getUsername());
                     return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));

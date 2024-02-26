@@ -1,11 +1,12 @@
 package at.if22b208.mtc.util.mapper;
 
-import at.if22b208.mtc.dto.user.UserDataDto;
-import at.if22b208.mtc.dto.user.UserStatsDto;
-import at.if22b208.mtc.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import at.if22b208.mtc.dto.user.UserDataDto;
+import at.if22b208.mtc.dto.user.UserStatsDto;
+import at.if22b208.mtc.entity.User;
 
 /**
  * The {@code UserMapper} interface is used with MapStruct to automatically generate
@@ -42,6 +43,6 @@ public interface UserMapper {
      * @param user The {@link User} to be mapped.
      * @return The corresponding {@link UserStatsDto}.
      */
-    @Mapping(source = "username", target="name")
+    @Mapping(source = "username", target = "name")
     UserStatsDto mapToUserStatsDto(User user);
 }

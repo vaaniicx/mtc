@@ -6,8 +6,11 @@ import java.time.format.DateTimeFormatter;
 
 public class Response {
     private final int status;
+
     private final String message;
+
     private final String contentType;
+
     private final String content;
 
     public Response(HttpStatus httpStatus, ContentType contentType, String content) {

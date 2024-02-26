@@ -36,7 +36,8 @@ public class CardController implements Controller {
      * @param user The user for whom to retrieve cards.
      * @return Response containing the list of cards in JSON format.
      */
-    private Response getCards(User user) throws DatabaseTransactionException {
+    private Response getCards(User user)
+            throws DatabaseTransactionException {
         List<Card> cards = CardService.getInstance().getAllByOwner(user);
 
         if (cards.isEmpty()) {

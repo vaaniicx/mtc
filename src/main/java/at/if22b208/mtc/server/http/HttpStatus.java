@@ -14,6 +14,7 @@ public enum HttpStatus {
     NOT_IMPLEMENTED(501, "Not Implemented");
 
     public final int code;
+
     public final String message;
 
     HttpStatus(int code, String message) {
