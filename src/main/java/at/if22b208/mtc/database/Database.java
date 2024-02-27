@@ -78,7 +78,7 @@ public class Database implements AutoCloseable {
             statement.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            throw new DatabaseTransactionException("");
+            throw new DatabaseTransactionException("Exception while processing executing update query.");
         }
     }
 
@@ -110,7 +110,7 @@ public class Database implements AutoCloseable {
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
-            throw new DatabaseTransactionException("");
+            throw new DatabaseTransactionException("Exception while processing executing insert query.");
         }
         return null;
     }
@@ -148,7 +148,7 @@ public class Database implements AutoCloseable {
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
-            throw new DatabaseTransactionException("");
+            throw new DatabaseTransactionException("Exception while processing executing select query.");
         }
         return result;
     }
