@@ -7,6 +7,11 @@ import at.if22b208.mtc.entity.User;
  * The Elo system is a method for calculating the relative skill levels of players in two-player games.
  */
 public class EloSystem {
+
+    private EloSystem() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * The K-factor determines the sensitivity of the system to rating differences.
      */
