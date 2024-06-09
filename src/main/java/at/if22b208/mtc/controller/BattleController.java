@@ -100,17 +100,15 @@ public class BattleController implements Controller {
         String root = request.getRoot();
         Transaction transaction = new Transaction();
         try {
-            if (root.equalsIgnoreCase("battles")) {
-                if (request.getMethod() == Method.POST) {
-                    // Retrieve the username from the user session
-                    String username = SessionUtils.getUsernameFromHeader(request.getHeader());
-                    User user = UserService.getInstance().getByUsername(username);
+            if (root.equalsIgnoreCase("battles") && request.getMethod() == Method.POST) {
+                // Retrieve the username from the user session
+                String username = SessionUtils.getUsernameFromHeader(request.getHeader());
+                User user = UserService.getInstance().getByUsername(username);
 
-                    Response response = waitForBattleToBeReady(user);
-                    transaction.commit();
+                Response response = waitForBattleToBeReady(user);
+                transaction.commit();
 
-                    return response;
-                }
+                return response;
             }
         } catch (DatabaseTransactionException e) {
             try {
