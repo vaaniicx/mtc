@@ -36,6 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 public class HashingUtils {
     private static final String ALGORITHM = "PBKDF2WithHmacSHA1";
 
+    private HashingUtils() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Hashes the provided plain text using PBKDF2 with HMAC SHA-256.
      *
