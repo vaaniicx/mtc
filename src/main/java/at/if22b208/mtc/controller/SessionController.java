@@ -45,15 +45,13 @@ public class SessionController implements Controller {
                     HashingUtils.generateSalt(credentialsDto.getUsername()));
             // Retrieve the user by username
             User user = UserService.getInstance().getByUsername(credentialsDto.getUsername());
-            if (user != null) {
-                // Check if the user exists and if the provided username and password match
-                if (Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(
+            if (user != null && Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(
                         user.getPassword(), hash)) {
                     // Successful login
                     String token = SessionManager.createSession(user.getUsername());
                     return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));
                 }
-            }
+
         } catch (HashingException e) {
             // Log a warning in case of a hashing error
             log.warn("Error during login for username '{}': {}", credentialsDto.getUsername(), e.getMessage());
