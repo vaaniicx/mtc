@@ -106,48 +106,33 @@ public class UserController implements Controller {
     public Response handleRequest(Request request) {
         String root = request.getRoot();
 
+        if (!root.equalsIgnoreCase("users")) {
+            return ResponseUtils.notImplemented();
+        }
+
         Transaction transaction = new Transaction();
         try {
-            if (root.equalsIgnoreCase("users")) {
-                String body = request.getBody();
-                if (request.getMethod() == Method.POST) {
-                    if (request.getPathParts().size() == 1) {
-                        UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
-                        try {
-                            if (dto == null) {
-                                return ResponseUtils.notImplemented();
-                            }
+            String body = request.getBody();
+            if (request.getMethod() == Method.POST && request.getPathParts().size() == 1) {
+                UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
+                try {
+                    return performUserCreation(dto, transaction);
+                } catch (HashingException e) {
+                    log.warn(e.getMessage());
+                }
+            }
 
-                            Response response = this.createUserWithCredentials(dto);
-                            transaction.commit();
+            if (!SessionUtils.isAuthorized(request.getHeader())) {
+                return ResponseUtils.unauthorized();
+            }
 
-                            return response;
-                        } catch (HashingException e) {
-                            log.warn(e.getMessage());
-                        }
-                    }
+            if (request.getPathParts().size() == 2) {
+                if (request.getMethod() == Method.GET) {
+                    return performUserRetrieval(this.getUserByUsername(request.getPathParts().get(1)), transaction);
                 }
 
-                if (!SessionUtils.isAuthorized(request.getHeader())) {
-                    return ResponseUtils.unauthorized();
-                }
-
-                if (request.getPathParts().size() == 2) {
-                    if (request.getMethod() == Method.GET) {
-                        Response response = this.getUserByUsername(request.getPathParts().get(1));
-                        transaction.commit();
-
-                        return response;
-                    }
-
-                    if (request.getMethod() == Method.PUT) {
-                        UserDataDto dto = JsonUtils.getObjectFromJsonString(body, UserDataDto.class);
-
-                        Response response = this.updateUserData(request.getPathParts().get(1), dto);
-                        transaction.commit();
-
-                        return response;
-                    }
+                if (request.getMethod() == Method.PUT) {
+                    return performUserUpdate(request, body, transaction);
                 }
             }
         } catch (DatabaseTransactionException e) {
@@ -160,6 +145,29 @@ public class UserController implements Controller {
         }
 
         return ResponseUtils.notImplemented();
+    }
+
+    private Response performUserCreation(UserCredentialsDto dto, Transaction transaction)
+            throws DatabaseTransactionException, HashingException {
+        if (dto == null) {
+            return ResponseUtils.notImplemented();
+        }
+        return performUserRetrieval(this.createUserWithCredentials(dto), transaction);
+    }
+
+    private Response performUserRetrieval(Response request, Transaction transaction)
+            throws DatabaseTransactionException {
+        Response response = request;
+        transaction.commit();
+
+        return response;
+    }
+
+    private Response performUserUpdate(Request request, String body, Transaction transaction)
+            throws DatabaseTransactionException {
+        UserDataDto dto = JsonUtils.getObjectFromJsonString(body, UserDataDto.class);
+
+        return performUserRetrieval(this.updateUserData(request.getPathParts().get(1), dto), transaction);
     }
 
     /**
