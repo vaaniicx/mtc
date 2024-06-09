@@ -65,13 +65,11 @@ public class ScoreboardController implements Controller {
         String root = request.getRoot();
         Transaction transaction = new Transaction();
         try {
-            if (root.equalsIgnoreCase("scoreboard")) {
-                if (request.getMethod() == Method.GET) {
-                    Response response = this.getScoreboard();
-                    transaction.commit();
+            if (root.equalsIgnoreCase("scoreboard") && request.getMethod() == Method.GET) {
+                Response response = this.getScoreboard();
+                transaction.commit();
 
-                    return response;
-                }
+                return response;
             }
         } catch (DatabaseTransactionException e) {
             try {
