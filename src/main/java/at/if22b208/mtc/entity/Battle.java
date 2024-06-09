@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import at.if22b208.mtc.config.MtcConstants;
 import at.if22b208.mtc.entity.enumeration.AttackEffectiveness;
 import at.if22b208.mtc.entity.enumeration.CardElementType;
+import at.if22b208.mtc.entity.enumeration.CardName;
 import at.if22b208.mtc.entity.enumeration.CardType;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -202,9 +203,10 @@ public class Battle {
      * @param b Card from Player B.
      */
     private void handleGoblinVsDragon(Card a, Card b) {
-        if (a.getName().contains("goblin") && b.getName().contains("dragon")) {
+        if (a.getName().contains(CardName.GOBLIN.getValue()) && b.getName().contains(CardName.DRAGON.getValue())) {
             a.setDamage(0);
-        } else if (b.getName().contains("goblin") && a.getName().contains("dragon")) {
+        } else if (b.getName().contains(CardName.GOBLIN.getValue()) &&
+                a.getName().contains(CardName.DRAGON.getValue())) {
             b.setDamage(0);
         }
     }
@@ -216,9 +218,9 @@ public class Battle {
      * @param b Card from Player B.
      */
     private void handleWizardVsOrk(Card a, Card b) {
-        if (a.getName().contains("ork") && b.getName().contains("wizard")) {
+        if (a.getName().contains(CardName.ORK.getValue()) && b.getName().contains(CardName.WIZARD.getValue())) {
             a.setDamage(0);
-        } else if (b.getName().contains("ork") && a.getName().contains("wizard")) {
+        } else if (b.getName().contains(CardName.ORK.getValue()) && a.getName().contains(CardName.WIZARD.getValue())) {
             b.setDamage(0);
         }
     }
@@ -230,9 +232,11 @@ public class Battle {
      * @param b Card from Player B.
      */
     private void handleKnightVsWaterSpell(Card a, Card b) {
-        if (a.getName().contains("knight") && b.getName().equalsIgnoreCase("waterspell")) {
+        if (a.getName().contains(CardName.KNIGHT.getValue()) &&
+                b.getName().equalsIgnoreCase(CardName.WATER_SPELL.getValue())) {
             a.setDamage(0);
-        } else if (b.getName().contains("knight") && a.getName().equalsIgnoreCase("waterspell")) {
+        } else if (b.getName().contains(CardName.KNIGHT.getValue()) &&
+                a.getName().equalsIgnoreCase(CardName.WATER_SPELL.getValue())) {
             b.setDamage(0);
         }
     }
@@ -244,9 +248,9 @@ public class Battle {
      * @param b Card from Player B.
      */
     private void handleKrakenVsSpell(Card a, Card b) {
-        if (a.getCardType().equals(CardType.SPELL) && b.getName().contains("kraken")) {
+        if (a.getCardType().equals(CardType.SPELL) && b.getName().contains(CardName.KRAKEN.getValue())) {
             a.setDamage(0);
-        } else if (b.getCardType().equals(CardType.SPELL) && a.getName().contains("kraken")) {
+        } else if (b.getCardType().equals(CardType.SPELL) && a.getName().contains(CardName.KRAKEN.getValue())) {
             b.setDamage(0);
         }
     }
@@ -258,9 +262,11 @@ public class Battle {
      * @param b Card from Player B.
      */
     private void handleFireElfVsDragon(Card a, Card b) {
-        if (a.getName().contains("dragon") && b.getName().equalsIgnoreCase("fireelf")) {
+        if (a.getName().contains(CardName.DRAGON.getValue()) &&
+                b.getName().equalsIgnoreCase(CardName.FIRE_ELF.getValue())) {
             a.setDamage(0);
-        } else if (b.getName().contains("dragon") && a.getName().equalsIgnoreCase("fireelf")) {
+        } else if (b.getName().contains(CardName.DRAGON.getValue()) &&
+                a.getName().equalsIgnoreCase(CardName.FIRE_ELF.getValue())) {
             b.setDamage(0);
         }
     }
