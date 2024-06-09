@@ -60,7 +60,7 @@ import lombok.extern.slf4j.Slf4j;
         Card tradingCard = CardService.getInstance().getById(dto.getCardUuid());
 
         // Can only create a deal for a card that is owned by the requesting user or card is not in deck
-        if (tradingCard == null || !hasCardOwned(user, tradingCard) || hasCardLocked(user, tradingCard)) {
+        if (tradingCard == null || doesNotOwnCard(user, tradingCard) || hasCardLocked(user, tradingCard)) {
             return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARD_LOCKED);
         }
 
@@ -90,7 +90,7 @@ import lombok.extern.slf4j.Slf4j;
         Card tradingCard = CardService.getInstance().getById(deal.getCardUuid());
 
         // Can only delete a deal for a card that is owned by the requesting user
-        if (tradingCard == null || !hasCardOwned(user, tradingCard)) {
+        if (tradingCard == null || doesNotOwnCard(user, tradingCard)) {
             return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARD_NOT_OWNED);
         }
 
@@ -117,7 +117,7 @@ import lombok.extern.slf4j.Slf4j;
         Card offeredCard = CardService.getInstance().getById(cardUuid);
 
         // Can only delete a deal for a card that is owned by the requesting user
-        if (offeredCard == null || isUserFromDeal(user, deal) || !hasCardOwned(user, offeredCard) ||
+        if (offeredCard == null || isUserFromDeal(user, deal) || doesNotOwnCard(user, offeredCard) ||
                 hasCardLocked(user, offeredCard) || !hasTradingRequirements(deal, offeredCard)) {
             return ResponseUtils.forbidden(MessageConstants.TRADING_DEAL_CARRY_OUT_FAILURE);
         }
@@ -137,10 +137,10 @@ import lombok.extern.slf4j.Slf4j;
      *
      * @param user The user to check ownership for.
      * @param card The card to check ownership of.
-     * @return True if the user owns the card, false otherwise.
+     * @return True if the user does not own the card, false otherwise.
      */
-    private boolean hasCardOwned(User user, Card card) {
-        return card.getUserUuid().equals(user.getUuid());
+    private boolean doesNotOwnCard(User user, Card card) {
+        return !card.getUserUuid().equals(user.getUuid());
     }
 
     /**
