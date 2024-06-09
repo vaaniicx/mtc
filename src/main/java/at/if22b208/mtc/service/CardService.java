@@ -1,5 +1,6 @@
 package at.if22b208.mtc.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class CardService implements Service<Card, UUID> {
      */
     @Override
     public List<Card> getAll() {
-        return null;
+        return Collections.emptyList();
     }
 
     /**
