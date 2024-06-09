@@ -7,14 +7,14 @@
  */
 package at.if22b208.mtc.entity;
 
+import java.util.UUID;
+
 import at.if22b208.mtc.entity.enumeration.CardElementType;
 import at.if22b208.mtc.entity.enumeration.CardType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import lombok.With;
-
-import java.util.UUID;
 
 /**
  * A builder-pattern based class for creating instances of {@code Card}.
@@ -94,8 +94,16 @@ public class Card {
             }
             this.name = name.toLowerCase();
             this.cardType = this.name.contains("spell") ? CardType.SPELL : CardType.MONSTER;
-            this.cardElementType = this.name.contains("fire") ? CardElementType.FIRE : this.name.contains("water") ?
-                    CardElementType.WATER : CardElementType.NORMAL;
+            if (this.name.contains("fire")) {
+                this.cardElementType = CardElementType.FIRE;
+            } else {
+                if (this.name.contains("water")) {
+                    this.cardElementType = CardElementType.WATER;
+                }
+                else {
+                    this.cardElementType = CardElementType.NORMAL;
+                }
+            }
             return this;
         }
     }
