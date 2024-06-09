@@ -1,6 +1,7 @@
 package at.if22b208.mtc.repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class CardRepository implements Repository<Card, UUID> {
      */
     @Override
     public List<Optional<Card>> findAll() {
-        return null;
+        return Collections.emptyList();
     }
 
     /**
