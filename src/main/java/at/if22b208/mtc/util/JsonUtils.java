@@ -15,6 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 public class JsonUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    private JsonUtils() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Deserializes a JSON string into an object of the specified type.
      *
