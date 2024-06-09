@@ -60,24 +60,6 @@ public class Card {
     private CardElementType cardElementType;
 
     /**
-     * Copy constructor to create a new instance with the same values as an existing card.
-     *
-     * @param originalCard The original card to be copied.
-     * @return A new instance of {@code Card} with the same values as the original card.
-     */
-    public static Card copy(Card originalCard) {
-        return Card.builder()
-                .uuid(originalCard.getUuid())
-                .name(originalCard.getName())
-                .damage(originalCard.getDamage())
-                .packageId(originalCard.getPackageId())
-                .userUuid(originalCard.getUserUuid())
-                .cardType(originalCard.getCardType())
-                .cardElementType(originalCard.getCardElementType())
-                .build();
-    }
-
-    /**
      * Builder class for {@code Card}, providing a name transformation based on certain keywords.
      */
     public static class CardBuilder {
