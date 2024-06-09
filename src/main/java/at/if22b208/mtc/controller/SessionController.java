@@ -46,11 +46,11 @@ public class SessionController implements Controller {
             // Retrieve the user by username
             User user = UserService.getInstance().getByUsername(credentialsDto.getUsername());
             if (user != null && Objects.equals(user.getUsername(), credentialsDto.getUsername()) && Objects.equals(
-                        user.getPassword(), hash)) {
-                    // Successful login
-                    String token = SessionManager.createSession(user.getUsername());
-                    return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));
-                }
+                    user.getPassword(), hash)) {
+                // Successful login
+                String token = SessionManager.createSession(user.getUsername());
+                return ResponseUtils.ok(ContentType.JSON, JsonUtils.getJsonStringFromObject(token));
+            }
 
         } catch (HashingException e) {
             // Log a warning in case of a hashing error
@@ -73,21 +73,18 @@ public class SessionController implements Controller {
 
         Transaction transaction = new Transaction();
         try {
-            if (root.equalsIgnoreCase("sessions")) {
-                if (request.getMethod() == Method.POST) {
-                    if (request.getPathParts().size() == 1) {
-                        String body = request.getBody().toLowerCase();
-                        UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
-                        if (dto == null) {
-                            return ResponseUtils.notImplemented();
-                        }
-
-                        Response response = login(dto);
-                        transaction.commit();
-
-                        return response;
-                    }
+            if (root.equalsIgnoreCase("sessions") && request.getMethod() == Method.POST &&
+                    request.getPathParts().size() == 1) {
+                String body = request.getBody().toLowerCase();
+                UserCredentialsDto dto = JsonUtils.getObjectFromJsonString(body, UserCredentialsDto.class);
+                if (dto == null) {
+                    return ResponseUtils.notImplemented();
                 }
+
+                Response response = login(dto);
+                transaction.commit();
+
+                return response;
             }
         } catch (DatabaseTransactionException e) {
             try {
