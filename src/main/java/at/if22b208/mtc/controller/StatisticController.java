@@ -62,16 +62,14 @@ public class StatisticController implements Controller {
                     return ResponseUtils.unauthorized();
                 }
 
-                if (request.getMethod() == Method.GET) {
-                    if (request.getPathParts().size() == 1) {
-                        // Retrieve the username from the user session
-                        String username = SessionUtils.getUsernameFromHeader(request.getHeader());
+                if (request.getMethod() == Method.GET && request.getPathParts().size() == 1) {
+                    // Retrieve the username from the user session
+                    String username = SessionUtils.getUsernameFromHeader(request.getHeader());
 
-                        Response response = getStats(username);
-                        transaction.commit();
+                    Response response = getStats(username);
+                    transaction.commit();
 
-                        return response;
-                    }
+                    return response;
                 }
             }
         } catch (DatabaseTransactionException e) {
